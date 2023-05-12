@@ -78,7 +78,7 @@ def register_git(manager: TaskManager, third_party: Path) -> bool:
     )
     manager.register(
         CloneGitRepo(
-            "github-shallow-clone.{path}.{project}.{branch}",
+            "github-shallow-clone.{path}.{project}-{branch}",
             third_party,
             "--depth=1",
             "--single-branch",

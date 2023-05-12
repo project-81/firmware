@@ -11,8 +11,9 @@ from vcorelib.task import Phony
 from vcorelib.task.manager import TaskManager
 
 # internal
+from configure_common import register_configure
 from git_common import register_git
-from python_common import ThirdPartyEditable
+from python_common import register_python
 
 
 def register(
@@ -25,18 +26,24 @@ def register(
 
     third_party = cwd.joinpath("third-party")
     register_git(manager, third_party)
+    register_python(manager, third_party)
+    register_configure(manager, third_party, substitutions)
 
     manager.register(
         Phony("third-party-clones"),
-        ["github-shallow-clone.Cherrg.gdbgui.fix_447"],
+        [
+            "github-shallow-clone.Cherrg.gdbgui-fix_447",
+            "github-shallow-clone.nodejs.node-v20.1.0",
+            "github-shallow-clone.ninja-build.ninja-v1.11.1",
+        ],
     )
 
     manager.register(
-        ThirdPartyEditable("third-party-editable-{project}", third_party),
-        ["third-party-clones"],
+        Phony("gdbgui"),
+        ["third-party-nox-gdbgui-build_executables_current_platform"],
     )
 
-    manager.register(Phony("deps"), ["third-party-editable-gdbgui"])
+    manager.register(Phony("deps"), ["gdbgui"])
 
     del project
     del substitutions
