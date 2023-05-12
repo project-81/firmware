@@ -1,0 +1,8 @@
+.*_cache
+build
+venv3*
+__pycache__
+*.pyc
+*-out*
+tags
+third-party
