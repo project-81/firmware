@@ -62,7 +62,6 @@ def add_program_path(
     """Register a path to a program."""
 
     prog = third_party.joinpath(*parts).resolve()
-    assert prog.is_file(), prog
     assert program not in PATHS, prog
 
     if update_path:
