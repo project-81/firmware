@@ -39,11 +39,11 @@ def register(
     )
 
     manager.register(
-        Phony("gdbgui"),
+        Phony("build-gdbgui"),
         ["third-party-nox-gdbgui-build_executables_current_platform"],
     )
 
-    manager.register(Phony("deps"), ["gdbgui"])
+    manager.register(Phony("deps"), ["build-gdbgui"])
 
     del project
     del substitutions

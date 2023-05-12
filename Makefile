@@ -8,12 +8,14 @@ $(error target this Makefile with 'mk', not '$(MAKE)' ($(MK_INFO)))
 endif
 ###############################################################################
 
-.PHONY: all clean
+.PHONY: clean gdbgui
 
-.DEFAULT_GOAL := all
+.DEFAULT_GOAL := gdbgui
 
-all:
-	+@echo "TODO"
+THIRD_PARTY := $($(PROJ)_DIR)/third-party
+
+gdbgui:
+	$(THIRD_PARTY)/gdbgui/build/executable/gdbgui.pex
 
 clean:
-	rm -rf $($(PROJ)_DIR)/third-party
+	rm -rf $(THIRD_PARTY)
