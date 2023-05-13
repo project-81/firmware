@@ -11,9 +11,11 @@ from vcorelib.task import Phony
 from vcorelib.task.manager import TaskManager
 
 # internal
-from configure_common import register_configure
-from git_common import register_git
-from python_common import register_python
+from local.configure import register_configure
+from local.crosstool import register_crosstool
+from local.gdbgui import register_gdbgui
+from local.git import register_git
+from local.python import register_python
 
 
 def register(
@@ -25,27 +27,27 @@ def register(
     """Register project tasks to the manager."""
 
     third_party = cwd.joinpath("third-party")
+    third_party.mkdir(parents=True, exist_ok=True)
+    third_party.joinpath("tarballs").mkdir(parents=True, exist_ok=True)
+
     register_git(manager, third_party)
     register_python(manager, third_party)
     register_configure(manager, third_party, substitutions)
+    register_gdbgui(manager, third_party)
+    register_crosstool(manager, cwd)
 
     manager.register(
         Phony("third-party-clones"),
         [
+            "github-clone.picolibc.picolibc",
             "github-shallow-clone.Cherrg.gdbgui-fix_447",
             "github-shallow-clone.nodejs.node-v20.1.0",
             "github-shallow-clone.ninja-build.ninja-v1.11.1",
         ],
     )
 
-    manager.register(
-        Phony("build-gdbgui"),
-        ["third-party-nox-gdbgui-build_executables_current_platform"],
-    )
-
-    manager.register(Phony("deps"), ["build-gdbgui"])
+    manager.register(Phony("deps"), ["toolchains"])
 
     del project
-    del substitutions
 
     return True

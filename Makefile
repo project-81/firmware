@@ -8,14 +8,18 @@ $(error target this Makefile with 'mk', not '$(MAKE)' ($(MK_INFO)))
 endif
 ###############################################################################
 
-.PHONY: clean gdbgui
+.PHONY: clean-toolchains
 
-.DEFAULT_GOAL := gdbgui
+.DEFAULT_GOAL := all
 
-THIRD_PARTY := $($(PROJ)_DIR)/third-party
+all:
+	+@echo "TODO"
 
-gdbgui:
-	$(THIRD_PARTY)/gdbgui/build/executable/gdbgui.pex
+TOOLCHAINS  := $($(PROJ)_DIR)/toolchains
 
-clean:
-	rm -rf $(THIRD_PARTY)
+clean-toolchain-%:
+	rm -rf $(TOOLCHAINS)/$*/build*
+	rm -rf $(TOOLCHAINS)/$*/out
+	rm -f $(BUILD_DIR)/crosstool-$*.txt
+
+clean-toolchains: clean-toolchain-arm-picolibc-eabi

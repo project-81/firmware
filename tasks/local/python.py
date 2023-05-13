@@ -48,7 +48,7 @@ class ThirdPartyNox(ConcreteOnceMixin, SubprocessLogMixin):
 
 
 def register_python(manager: TaskManager, third_party: Path) -> bool:
-    """Register git tasks."""
+    """Register python tasks."""
 
     manager.register(
         ThirdPartyEditable("third-party-editable-{pyproject}", third_party), []
