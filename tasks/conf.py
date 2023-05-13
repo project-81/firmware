@@ -14,6 +14,7 @@ from vcorelib.task.manager import TaskManager
 from local.crosstool import register_crosstool
 from local.gdbgui import register_gdbgui
 from local.git import register_git
+from local.jlink import register_jlink
 from local.ninja import register_ninja
 from local.node import register_node
 from local.openocd import register_openocd
@@ -32,12 +33,17 @@ def register(
     third_party.mkdir(parents=True, exist_ok=True)
     third_party.joinpath("tarballs").mkdir(parents=True, exist_ok=True)
 
-    register_git(manager, third_party)
-    register_python(manager, third_party)
-    register_ninja(manager, third_party)
-    register_node(manager, third_party)
-    register_openocd(manager, third_party)
-    register_gdbgui(manager, third_party)
+    for reg in [
+        register_git,
+        register_python,
+        register_ninja,
+        register_node,
+        register_openocd,
+        register_gdbgui,
+        register_jlink,
+    ]:
+        reg(manager, third_party)
+
     register_crosstool(manager, cwd)
 
     manager.register(
