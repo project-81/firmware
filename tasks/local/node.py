@@ -27,7 +27,7 @@ def register_node(manager: TaskManager, third_party: Path) -> bool:
             ninja=program_str("ninja"),
             ninja_args=["-C", "out/Release"],
         ),
-        ["build-ninja"],
+        ["build-ninja", "github-shallow-clone.nodejs.node-v20.1.0"],
     )
 
     node_root = third_party.joinpath("node")

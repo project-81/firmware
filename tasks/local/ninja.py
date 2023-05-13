@@ -26,8 +26,10 @@ def register_ninja(manager: TaskManager, third_party: Path) -> bool:
             ninja="ninja",
             configure="configure.py",
         ),
-        [],
+        ["github-shallow-clone.ninja-build.ninja-v1.11.1"],
     )
 
     # A path to the ninja binary.
     add_program_path("ninja", third_party, "ninja", "ninja", update_path=True)
+
+    return True

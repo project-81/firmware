@@ -11,6 +11,7 @@ from vcorelib.task import Phony
 from vcorelib.task.manager import TaskManager
 
 # internal
+from local.boards import register_boards
 from local.crosstool import register_crosstool
 from local.gdbgui import register_gdbgui
 from local.git import register_git
@@ -41,20 +42,15 @@ def register(
         register_openocd,
         register_gdbgui,
         register_jlink,
+        register_boards,
     ]:
-        reg(manager, third_party)
+        assert reg(manager, third_party), reg
 
-    register_crosstool(manager, cwd)
+    assert register_crosstool(manager, cwd)
 
     manager.register(
         Phony("third-party-clones"),
-        [
-            "github-clone.picolibc.picolibc",
-            "github-clone.openocd-org.openocd",
-            "github-shallow-clone.Cherrg.gdbgui-fix_447",
-            "github-shallow-clone.nodejs.node-v20.1.0",
-            "github-shallow-clone.ninja-build.ninja-v1.11.1",
-        ],
+        ["github-shallow-clone.Cherrg.gdbgui-fix_447"],
     )
 
     manager.register(Phony("deps"), ["toolchains"])

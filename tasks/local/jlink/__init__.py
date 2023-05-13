@@ -86,7 +86,7 @@ class JlinkTask(SubprocessLogMixin):
 
         third_party = args[0]
         return await self.exec(
-            third_party.joinpath("jlink", kwargs["program"], *args[1:])
+            third_party.joinpath("jlink", kwargs["program"]), *args[1:]
         )
 
 

@@ -20,8 +20,6 @@ class CrosstoolTask(ConcreteOnceMixin, SubprocessLogMixin):
     A class implementing a task for building toolchains with crosstool-ng.
     """
 
-    default_requirements = {"vmklib.init", "third-party-clones"}
-
     async def run(self, inbox: Inbox, outbox: Outbox, *args, **kwargs) -> bool:
         """Editable-install a third-party dependency."""
 
@@ -35,7 +33,8 @@ def register_crosstool(manager: TaskManager, root: Path) -> bool:
     toolchains_root = root.joinpath("toolchains")
 
     manager.register(
-        CrosstoolTask("crosstool-{toolchain}", toolchains_root), []
+        CrosstoolTask("crosstool-{toolchain}", toolchains_root),
+        ["github-clone.picolibc.picolibc"],
     )
 
     # Add toolchains to path.
@@ -46,3 +45,5 @@ def register_crosstool(manager: TaskManager, root: Path) -> bool:
     manager.register(
         Phony("toolchains"), [f"crosstool-{x}" for x in toolchains]
     )
+
+    return True

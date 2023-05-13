@@ -8,12 +8,17 @@ $(error target this Makefile with 'mk', not '$(MAKE)' ($(MK_INFO)))
 endif
 ###############################################################################
 
-.PHONY: clean-toolchains
+.PHONY: clean-toolchains host-jlink-docs
 
 .DEFAULT_GOAL := all
 
 all:
 	+@echo "TODO"
+
+THIRD_PARTY := $($(PROJ)_DIR)/third-party
+
+host-jlink-docs:
+	cd $(THIRD_PARTY)/jlink/Doc/Manuals && python -m http.server 0
 
 TOOLCHAINS  := $($(PROJ)_DIR)/toolchains
 

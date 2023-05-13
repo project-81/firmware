@@ -25,3 +25,5 @@ def register_gdbgui(manager: TaskManager, third_party: Path) -> bool:
         ),
         ["third-party-nox-gdbgui-build_executables_current_platform"],
     )
+
+    return True

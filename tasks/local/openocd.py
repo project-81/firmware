@@ -45,7 +45,7 @@ def register_openocd(manager: TaskManager, third_party: Path) -> bool:
             project=proj,
             make=True,
         ),
-        [],
+        ["github-clone.openocd-org.openocd"],
     )
 
     repo = third_party.joinpath(proj)
@@ -53,3 +53,5 @@ def register_openocd(manager: TaskManager, third_party: Path) -> bool:
     add_program_path(proj, repo, "src", proj)
 
     manager.register(OpenocdTask(proj + "-{interface}", repo), [])
+
+    return True
