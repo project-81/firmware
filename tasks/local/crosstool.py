@@ -11,6 +11,9 @@ from vcorelib.task.manager import TaskManager
 from vcorelib.task.subprocess.run import SubprocessLogMixin
 from vmklib.tasks.mixins.concrete import ConcreteOnceMixin
 
+# internal
+from local.common import add_path
+
 
 class CrosstoolTask(ConcreteOnceMixin, SubprocessLogMixin):
     """
@@ -22,17 +25,23 @@ class CrosstoolTask(ConcreteOnceMixin, SubprocessLogMixin):
     async def run(self, inbox: Inbox, outbox: Outbox, *args, **kwargs) -> bool:
         """Editable-install a third-party dependency."""
 
-        cwd = args[0].joinpath("toolchains", kwargs["toolchain"])
+        cwd = args[0].joinpath(kwargs["toolchain"])
         return await self.exec("ct-ng", "-C", str(cwd), "build")
 
 
-def register_crosstool(manager: TaskManager, third_party: Path) -> bool:
+def register_crosstool(manager: TaskManager, root: Path) -> bool:
     """Register python tasks."""
 
-    manager.register(CrosstoolTask("crosstool-{toolchain}", third_party), [])
+    toolchains_root = root.joinpath("toolchains")
+
+    manager.register(
+        CrosstoolTask("crosstool-{toolchain}", toolchains_root), []
+    )
 
     # Add toolchains to path.
     toolchains = ["arm-picolibc-eabi"]
+    for toolchain in toolchains:
+        add_path(toolchains_root.joinpath(toolchain, "out", "bin"))
 
     manager.register(
         Phony("toolchains"), [f"crosstool-{x}" for x in toolchains]
