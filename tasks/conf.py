@@ -40,6 +40,7 @@ def register(
         Phony("third-party-clones"),
         [
             "github-clone.picolibc.picolibc",
+            "github-clone.openocd-org.openocd",
             "github-shallow-clone.Cherrg.gdbgui-fix_447",
             "github-shallow-clone.nodejs.node-v20.1.0",
             "github-shallow-clone.ninja-build.ninja-v1.11.1",
