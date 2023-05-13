@@ -34,7 +34,7 @@ class ThirdPartyConfigure(ConcreteOnceMixin, SubprocessLogMixin):
         result = True
 
         # Bootstrap.
-        if not Path(configure).is_file():
+        if not Path(root, configure).is_file():
             result &= await self.shell_cmd_in_dir(
                 root,
                 [f"./{kwargs.get('bootstrap', 'bootstrap')}"]
