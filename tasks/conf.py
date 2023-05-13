@@ -11,10 +11,12 @@ from vcorelib.task import Phony
 from vcorelib.task.manager import TaskManager
 
 # internal
-from local.configure import register_configure
 from local.crosstool import register_crosstool
 from local.gdbgui import register_gdbgui
 from local.git import register_git
+from local.ninja import register_ninja
+from local.node import register_node
+from local.openocd import register_openocd
 from local.python import register_python
 
 
@@ -32,7 +34,9 @@ def register(
 
     register_git(manager, third_party)
     register_python(manager, third_party)
-    register_configure(manager, third_party, substitutions)
+    register_ninja(manager, third_party)
+    register_node(manager, third_party)
+    register_openocd(manager, third_party)
     register_gdbgui(manager, third_party)
     register_crosstool(manager, cwd)
 
