@@ -18,13 +18,15 @@ THIRD_PARTY := $($(PROJ)_DIR)/third-party
 host-jlink-docs:
 	cd $(THIRD_PARTY)/jlink/Doc/Manuals && python -m http.server 0
 
-TOOLCHAINS  := $($(PROJ)_DIR)/toolchains
+TOOLCHAINS := $($(PROJ)_DIR)/toolchains
 
 clean-compile-%:
 	rm -rf $(BUILD_DIR)/$*
 
-clean: clean-compile-arm-picolibc-eabi
+clean: clean-compile-arm-picolibc-eabi clean-compile-arm-none-eabi
 	ninja -t clean
+	ninja -t cleandead
+	rm -f $($(PROJ)_DIR)/compile_commands.json
 
 clean-toolchain-%:
 	rm -rf $(TOOLCHAINS)/$*/build* $(TOOLCHAINS)/$*/include

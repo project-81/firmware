@@ -5,12 +5,12 @@ A module implementing tasks for building ninja.
 # built-in
 from pathlib import Path
 
-# third-party
-from vcorelib.task.manager import TaskManager
-
 # internal
 from local.common import add_program_path
 from local.configure import ThirdPartyConfigure
+
+# third-party
+from vcorelib.task.manager import TaskManager
 
 
 def register_ninja(manager: TaskManager, third_party: Path) -> bool:
