@@ -17,5 +17,3 @@ rule link
   command = $gcc $cflags $ldflags $in -o $out
 
 build_dir = build/$toolchain/$arch/$cpu
-
-include $include_dir/sources.ninja

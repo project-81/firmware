@@ -1,0 +1,31 @@
+src_dir = src
+
+# Common sources.
+build $build_dir/common/sample1.o: cc $src_dir/common/sample1.c
+build $build_dir/common/sample2.o: cc $src_dir/common/sample2.c
+
+# Chip sources.
+
+# Architecture sources.
+
+# CPU sources.
+
+# Board sources.
+
+# Common application sources.
+build $build_dir/apps/common/test1.o: cc $src_dir/apps/common/test1.c
+build $build_dir/apps/common/test2.o: cc $src_dir/apps/common/test2.c
+
+# Board application sources.
+
+build $build_dir/apps/common/test1.elf: link $build_dir/apps/common/test1.o $
+                                             $build_dir/common/sample1.o $
+                                             $build_dir/common/sample2.o
+
+build $build_dir/apps/common/test2.elf: link $build_dir/apps/common/test2.o $
+                                             $build_dir/common/sample1.o $
+                                             $build_dir/common/sample2.o
+
+# A phony target to build all applications.
+build apps: phony $build_dir/apps/common/test1.elf $
+                  $build_dir/apps/common/test2.elf

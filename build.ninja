@@ -1,8 +1,7 @@
 include_dir = ninja
-include $include_dir/common.ninja
 
-# Boards.
-subninja $include_dir/boards/relax_kit.ninja
+include $include_dir/common.ninja
+include $include_dir/boards/all.ninja
 
 # Build all boards by default.
 default relax_kit

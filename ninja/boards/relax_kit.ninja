@@ -1,5 +1,0 @@
-chip = xmc4700-2048
-include $include_dir/rules.ninja
-
-# Applications to buld for this board.
-build relax_kit: phony apps

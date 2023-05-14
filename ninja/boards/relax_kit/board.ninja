@@ -1,0 +1,7 @@
+board = relax_kit
+chip = xmc4700-2048
+
+include $include_dir/rules.ninja
+include $include_dir/boards/$board/sources.ninja
+
+build $board: phony apps

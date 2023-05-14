@@ -1,5 +1,5 @@
-#include "sample1.h"
-#include "sample2.h"
+#include "common/sample1.h"
+#include "common/sample2.h"
 
 int test2(int a, int b) {
 	return a + b;
