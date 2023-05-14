@@ -8,12 +8,10 @@ $(error target this Makefile with 'mk', not '$(MAKE)' ($(MK_INFO)))
 endif
 ###############################################################################
 
-.PHONY: clean-toolchains host-jlink-docs
+.PHONY: compdb clean clean-toolchains host-jlink-docs
 
-.DEFAULT_GOAL := all
-
-all:
-	+@echo "TODO"
+compdb:
+	ninja -t compdb > compile_commands.json
 
 THIRD_PARTY := $($(PROJ)_DIR)/third-party
 
@@ -22,9 +20,16 @@ host-jlink-docs:
 
 TOOLCHAINS  := $($(PROJ)_DIR)/toolchains
 
+clean-compile-%:
+	rm -rf $(BUILD_DIR)/$*
+
+clean: clean-compile-arm-picolibc-eabi
+	ninja -t clean
+
 clean-toolchain-%:
-	rm -rf $(TOOLCHAINS)/$*/build*
-	rm -rf $(TOOLCHAINS)/$*/out
+	rm -rf $(TOOLCHAINS)/$*/build* $(TOOLCHAINS)/$*/include
+	sudo rm -rf $(TOOLCHAINS)/$*/out
 	rm -f $(BUILD_DIR)/crosstool-$*.txt
 
-clean-toolchains: clean-toolchain-arm-picolibc-eabi
+clean-toolchains: clean-toolchain-arm-picolibc-eabi \
+                  clean-toolchain-arm-none-eabi

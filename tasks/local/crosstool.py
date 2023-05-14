@@ -21,14 +21,14 @@ class CrosstoolTask(ConcreteOnceMixin, SubprocessLogMixin):
     """
 
     async def run(self, inbox: Inbox, outbox: Outbox, *args, **kwargs) -> bool:
-        """Editable-install a third-party dependency."""
+        """Build a specific toolchain."""
 
         cwd = args[0].joinpath(kwargs["toolchain"])
         return await self.exec("ct-ng", "-C", str(cwd), "build")
 
 
 def register_crosstool(manager: TaskManager, root: Path) -> bool:
-    """Register python tasks."""
+    """Register crosstool tasks."""
 
     toolchains_root = root.joinpath("toolchains")
 
@@ -38,9 +38,11 @@ def register_crosstool(manager: TaskManager, root: Path) -> bool:
     )
 
     # Add toolchains to path.
+    # , "arm-none-eabi"
     toolchains = ["arm-picolibc-eabi"]
     for toolchain in toolchains:
         add_path(toolchains_root.joinpath(toolchain, "out", "bin"))
+        root.joinpath("build", toolchain).mkdir(parents=True, exist_ok=True)
 
     manager.register(
         Phony("toolchains"), [f"crosstool-{x}" for x in toolchains]

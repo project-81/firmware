@@ -7,3 +7,6 @@ __pycache__
 tags
 third-party
 .toolchains
+.ninja*
+*.old
+compile_commands.json

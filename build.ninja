@@ -1,0 +1,24 @@
+toolchain = arm-picolibc-eabi
+bins = toolchains/$toolchain/out/bin
+build_dir = build/$toolchain
+
+gcc = ./$bins/${toolchain}-gcc
+# gcc = arm-none-eabi-gcc
+
+target_cflags = -march=armv7e-m+fp -mcpu=cortex-m4 -mfpu=auto -mfloat-abi=hard
+
+# -lcrt0 -lc --crt0=minimal
+cflags = -Wall -Werror $target_cflags -specs=picolibc.specs
+
+rule cc
+  depfile = $out.d
+  deps = gcc
+  command = $gcc -MD -MF $out.d $cflags -c $in -o $out
+
+rule link
+  command = $gcc $cflags -Tsrc/test.ld $in -o $out
+
+build $build_dir/test.o: cc src/test.c
+build $build_dir/test.elf: link $build_dir/test.o
+
+default $build_dir/test.elf
