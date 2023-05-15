@@ -1,5 +1,7 @@
 # See:
 # https://github.com/cs01/gdbgui/issues/447
 # gdbgui
-
 nox
+
+vcorelib
+vmklib
