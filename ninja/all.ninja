@@ -1,1 +1,3 @@
 subninja $include_dir/boards/relax_kit/board.ninja
+
+build all_boards: phony relax_kit

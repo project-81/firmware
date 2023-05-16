@@ -3,5 +3,5 @@
 # gdbgui
 nox
 
-vcorelib
+yambs
 vmklib

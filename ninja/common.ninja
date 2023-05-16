@@ -1,2 +1,0 @@
-# Flags common to all builds, regardless of toolchain or hardware target.
-common_cflags = -Wall -Werror -Isrc

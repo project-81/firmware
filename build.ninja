@@ -1,7 +1,9 @@
 include_dir = ninja
 
-include $include_dir/common.ninja
-include $include_dir/boards/all.ninja
+# Flags common to all builds, regardless of toolchain or hardware target.
+common_cflags = -Wall -Werror -Isrc
+
+include $include_dir/all.ninja
 
 # Build all boards by default.
-default relax_kit
+default all_boards
