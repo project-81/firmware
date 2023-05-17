@@ -1,8 +1,0 @@
-# Use picolibc (https://github.com/picolibc/picolibc). This is how the
-# toolchain was built.
-specs = picolibc
-
-# Use c17 with GNU extensions (this is also the default if not specified).
-c_standard = gnu17
-
-toolchain_cflags = -specs=$specs.specs -std=$c_standard

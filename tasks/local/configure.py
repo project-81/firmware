@@ -25,7 +25,7 @@ class ThirdPartyConfigure(ConcreteOnceMixin, SubprocessLogMixin):
         return await self.shell(f'( cd "{path}"; {" ".join(cmd)} )')
 
     async def run(self, inbox: Inbox, outbox: Outbox, *args, **kwargs) -> bool:
-        """Editable-install a third-party dependency."""
+        """Build a third-party dependency."""
 
         root = args[0].joinpath(kwargs["project"])
 

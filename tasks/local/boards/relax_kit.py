@@ -16,7 +16,7 @@ BOARD_ARGS = {
     "relax_kit": ["-device", "XMC4700-2048", "-if", "SWD", "-speed", "auto"]
 }
 
-PORTS = {"gdb": 2000, "swo": 2001, "telnet": 2002, "rtt": 19021}
+PORTS = {"gdb": 2331, "swo": 2332, "telnet": 2333, "rtt": 19021}
 
 COMMON_ARGS = [
     "-port",

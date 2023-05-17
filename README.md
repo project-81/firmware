@@ -16,3 +16,7 @@ takes care of all prerequisites.*
 ### Optional
 
 * [ctags](https://github.com/universal-ctags/ctags)
+
+## Resources
+
+* [J-Link GDB Server](https://wiki.segger.com/J-Link_GDB_Server)

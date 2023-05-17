@@ -10,8 +10,10 @@ from typing import Dict
 from vcorelib.task import Phony
 from vcorelib.task.manager import TaskManager
 
-# internal
 from local.boards import register_boards
+
+# internal
+from local.common import PATHS
 from local.crosstool import register_crosstool
 from local.gdbgui import register_gdbgui
 from local.git import register_git
@@ -20,6 +22,7 @@ from local.ninja import register_ninja
 from local.node import register_node
 from local.openocd import register_openocd
 from local.python import register_python
+from local.yambs import register_yambs
 
 
 def register(
@@ -34,6 +37,10 @@ def register(
     third_party.mkdir(parents=True, exist_ok=True)
     third_party.joinpath("tarballs").mkdir(parents=True, exist_ok=True)
 
+    # Set some paths here for convenience.
+    PATHS["build"] = cwd.joinpath("build")
+    PATHS["third-party"] = third_party
+
     for reg in [
         register_git,
         register_python,
@@ -47,6 +54,7 @@ def register(
         assert reg(manager, third_party), reg
 
     assert register_crosstool(manager, cwd)
+    assert register_yambs(manager, cwd)
 
     manager.register(
         Phony("third-party-clones"),

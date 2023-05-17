@@ -1,5 +1,7 @@
 .*_cache
 build
+build.ninja
+ninja
 venv3*
 __pycache__
 *.pyc

@@ -1,8 +1,0 @@
-toolchain = arm-picolibc-eabi
-
-arch = armv7e-m+fp
-cpu = cortex-m4
-
-# We specified the '+fp' architecture extension because this chip's cortex-m4
-# has the single-precision floating-point unit.
-target_extra_cflags = -mfpu=auto -mfloat-abi=hard
