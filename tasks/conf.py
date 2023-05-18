@@ -4,16 +4,16 @@ A module for project-specific task registration.
 
 # built-in
 from pathlib import Path
+from sys import executable
 from typing import Dict
 
 # third-party
 from vcorelib.task import Phony
 from vcorelib.task.manager import TaskManager
 
-from local.boards import register_boards
-
 # internal
-from local.common import PATHS
+from local.boards import register_boards
+from local.common import PATHS, add_path
 from local.crosstool import register_crosstool
 from local.gdbgui import register_gdbgui
 from local.git import register_git
@@ -36,6 +36,9 @@ def register(
     third_party = cwd.joinpath("third-party")
     third_party.mkdir(parents=True, exist_ok=True)
     third_party.joinpath("tarballs").mkdir(parents=True, exist_ok=True)
+
+    # Ensure scripts in the virtual environment are available on the path.
+    add_path(Path(executable).parent)
 
     # Set some paths here for convenience.
     PATHS["build"] = cwd.joinpath("build")

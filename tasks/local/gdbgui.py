@@ -6,7 +6,7 @@ A module for project-specific gdbgui tasks.
 from pathlib import Path
 
 # third-party
-from vcorelib.task import Inbox, Outbox, Phony
+from vcorelib.task import Inbox, Outbox
 from vcorelib.task.manager import TaskManager
 from vcorelib.task.subprocess.run import SubprocessLogMixin
 
@@ -22,7 +22,7 @@ class Gdbgui(SubprocessLogMixin):
 
         entry = args[0].joinpath("gdbgui", "build", "executable", "gdbgui.pex")
 
-        toolchain = kwargs["toolchain"]
+        toolchain = kwargs.get("toolchain", "arm-picolibc-eabi")
         self.log.info("Toolchain: '%s'.", toolchain)
 
         architecture = kwargs.get("architecture", "armv7e-m+fp")
@@ -31,7 +31,7 @@ class Gdbgui(SubprocessLogMixin):
         cpu = kwargs.get("cpu", "cortex-m4")
         self.log.info("CPU: '%s'.", cpu)
 
-        app = kwargs.get("app", "common/test1.elf")
+        app = kwargs.get("app", f"common/{kwargs['board']}/test1.elf")
         self.log.info("App: '%s'.", app)
 
         # Build a path to the application.
@@ -50,10 +50,8 @@ def register_gdbgui(manager: TaskManager, third_party: Path) -> bool:
     """Register git tasks."""
 
     manager.register(
-        Gdbgui("gdbgui-{toolchain}", third_party),
+        Gdbgui("{board}-gdbgui", third_party),
         ["third-party-nox-gdbgui-build_executables_current_platform"],
     )
-
-    manager.register(Phony("gdbgui"), ["gdbgui-arm-picolibc-eabi"])
 
     return True

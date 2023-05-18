@@ -1,7 +1,7 @@
 ---
-includes:
-  - yambs/boards.yaml
-  - yambs/chips.yaml
+boards:
+  - name: relax_kit
+    chip: xmc4700-2048
 
-toolchains:
-  arm-picolibc-eabi: {}
+  - name: grand_central
+    chip: atsamd51x20

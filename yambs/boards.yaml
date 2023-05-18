@@ -1,4 +1,0 @@
----
-boards:
-  - name: relax_kit
-    chip: xmc4700-2048

@@ -6,7 +6,7 @@ A module for aggregating board tasks.
 from pathlib import Path
 
 # internal
-from local.boards.relax_kit import register_relax_kit
+from local.jlink.gdbserver import jlink_gdbserver_task
 
 # third-party
 from vcorelib.task.manager import TaskManager
@@ -15,5 +15,8 @@ from vcorelib.task.manager import TaskManager
 def register_boards(manager: TaskManager, third_party: Path) -> bool:
     """Register all board tasks."""
 
-    result = register_relax_kit(manager, third_party)
-    return result
+    # Should just read top-level config directly.
+    for board in ["relax_kit", "grand_central"]:
+        assert manager.register(jlink_gdbserver_task(board, third_party), [])
+
+    return True
