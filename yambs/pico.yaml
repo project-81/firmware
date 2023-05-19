@@ -1,11 +1,26 @@
 ---
 boards:
+  # - name: pi_pico_w
+  #   chip: rp2040
+  #   ldflags: *pico_ldflags
+  #   extra_dirs: *pico_dirs
+  #   extra_cflags: *pico_cflags
+
+  # - name: xiao_rp2040
+  #   chip: rp2040
+  #   ldflags: *pico_ldflags
+  #   extra_dirs: *pico_dirs
+  #   extra_cflags: *pico_cflags
+
   - name: pi_pico
     chip: rp2040
+    ldflags: &pico_ldflags
+      - -Tsrc/third-party/pico-sdk/src/rp2_common/pico_standard_link/memmap_default.ld
     extra_dirs: &pico_dirs
       - pico-sdk/src/common/pico_time
       - pico-sdk/src/common/pico_util
       - pico-sdk/src/common/pico_sync
+      - pico-sdk/src/rp2_common/boot_stage2
       - pico-sdk/src/rp2_common/hardware_gpio
       - pico-sdk/src/rp2_common/hardware_irq
       - pico-sdk/src/rp2_common/hardware_timer
@@ -21,6 +36,8 @@ boards:
       - -Isrc/third-party/pico-sdk/src/common/pico_time/include
       - -Isrc/third-party/pico-sdk/src/common/pico_sync/include
       - -Isrc/third-party/pico-sdk/src/common/pico_util/include
+      - -Isrc/third-party/pico-sdk/src/rp2_common/boot_stage2/asminclude
+      - -Isrc/third-party/pico-sdk/src/rp2_common/boot_stage2/include
       - -Isrc/third-party/pico-sdk/src/rp2_common/cmsis/include
       - -Isrc/third-party/pico-sdk/src/rp2_common/pico_platform/include
       - -Isrc/third-party/pico-sdk/src/rp2_common/pico_stdio/include
@@ -38,12 +55,3 @@ boards:
       - -Isrc/third-party/pico-sdk/src/rp2_common/hardware_xosc/include
       - -Isrc/third-party/pico-sdk/src/rp2040/hardware_regs/include
       - -Isrc/third-party/pico-sdk/src/rp2040/hardware_structs/include
-
-  - name: pi_pico_w
-    chip: rp2040
-    extra_dirs: *pico_dirs
-    extra_cflags: *pico_cflags
-  - name: xiao_rp2040
-    chip: rp2040
-    extra_dirs: *pico_dirs
-    extra_cflags: *pico_cflags
