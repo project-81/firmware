@@ -14,13 +14,13 @@ boards:
 
   - name: pi_pico
     chip: rp2040
+    uf2_family: RP2040
     ldflags: &pico_ldflags
       - -Tsrc/third-party/pico-sdk/src/rp2_common/pico_standard_link/memmap_default.ld
     extra_dirs: &pico_dirs
       - pico-sdk/src/common/pico_time
       - pico-sdk/src/common/pico_util
       - pico-sdk/src/common/pico_sync
-      - pico-sdk/src/rp2_common/boot_stage2
       - pico-sdk/src/rp2_common/hardware_gpio
       - pico-sdk/src/rp2_common/hardware_irq
       - pico-sdk/src/rp2_common/hardware_timer
@@ -28,19 +28,29 @@ boards:
       - pico-sdk/src/rp2_common/hardware_clocks
       - pico-sdk/src/rp2_common/hardware_watchdog
       - pico-sdk/src/rp2_common/hardware_sync
+      - pico-sdk/src/rp2_common/hardware_xosc
+      - pico-sdk/src/rp2_common/hardware_pll
+      - pico-sdk/src/rp2_common/pico_bootrom
       - pico-sdk/src/rp2_common/pico_runtime
+      - pico-sdk/src/rp2_common/pico_platform
+      - pico-sdk/src/rp2_common/pico_standard_link
+      - pico-sdk/src/rp2_common/pico_stdio
     extra_cflags: &pico_cflags
+      - -DLIB_PICO_PRINTF_PICO=1
       - -Isrc/third-party/pico-sdk/src/boards/include
       - -Isrc/third-party/pico-sdk/src/common/pico_base/include
       - -Isrc/third-party/pico-sdk/src/common/pico_stdlib/include
       - -Isrc/third-party/pico-sdk/src/common/pico_time/include
       - -Isrc/third-party/pico-sdk/src/common/pico_sync/include
       - -Isrc/third-party/pico-sdk/src/common/pico_util/include
+      - -Isrc/third-party/pico-sdk/src/common/pico_binary_info/include
       - -Isrc/third-party/pico-sdk/src/rp2_common/boot_stage2/asminclude
       - -Isrc/third-party/pico-sdk/src/rp2_common/boot_stage2/include
       - -Isrc/third-party/pico-sdk/src/rp2_common/cmsis/include
       - -Isrc/third-party/pico-sdk/src/rp2_common/pico_platform/include
       - -Isrc/third-party/pico-sdk/src/rp2_common/pico_stdio/include
+      - -Isrc/third-party/pico-sdk/src/rp2_common/pico_printf/include
+      - -Isrc/third-party/pico-sdk/src/rp2_common/pico_bootrom/include
       - -Isrc/third-party/pico-sdk/src/rp2_common/hardware_gpio/include
       - -Isrc/third-party/pico-sdk/src/rp2_common/hardware_base/include
       - -Isrc/third-party/pico-sdk/src/rp2_common/hardware_claim/include

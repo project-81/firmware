@@ -8,6 +8,7 @@ boards:
 
   - name: grand_central
     chip: atsamd51x20
+    uf2_family: SAMD51
 
 # https://github.com/adafruit/uf2-samdx1/blob/master/inc/uf2format.h#L14-L17
 # Because we're using the Adafruit board with UF2 bootloader, try to play
