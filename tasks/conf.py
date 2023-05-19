@@ -61,7 +61,11 @@ def register(
 
     manager.register(
         Phony("third-party-clones"),
-        ["github-shallow-clone.Cherrg.gdbgui-fix_447"],
+        [
+            "github-shallow-clone.Cherrg.gdbgui-fix_447",
+            "github-clone.raspberrypi.pico-sdk",
+            "github-clone.raspberrypi.pico-examples",
+        ],
     )
 
     manager.register(Phony("deps"), ["toolchains"])

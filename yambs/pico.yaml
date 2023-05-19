@@ -1,0 +1,49 @@
+---
+boards:
+  - name: pi_pico
+    chip: rp2040
+    extra_dirs: &pico_dirs
+      - pico-sdk/src/common/pico_time
+      - pico-sdk/src/common/pico_util
+      - pico-sdk/src/common/pico_sync
+      - pico-sdk/src/rp2_common/hardware_gpio
+      - pico-sdk/src/rp2_common/hardware_irq
+      - pico-sdk/src/rp2_common/hardware_timer
+      - pico-sdk/src/rp2_common/hardware_claim
+      - pico-sdk/src/rp2_common/hardware_clocks
+      - pico-sdk/src/rp2_common/hardware_watchdog
+      - pico-sdk/src/rp2_common/hardware_sync
+      - pico-sdk/src/rp2_common/pico_runtime
+    extra_cflags: &pico_cflags
+      - -Isrc/third-party/pico-sdk/src/boards/include
+      - -Isrc/third-party/pico-sdk/src/common/pico_base/include
+      - -Isrc/third-party/pico-sdk/src/common/pico_stdlib/include
+      - -Isrc/third-party/pico-sdk/src/common/pico_time/include
+      - -Isrc/third-party/pico-sdk/src/common/pico_sync/include
+      - -Isrc/third-party/pico-sdk/src/common/pico_util/include
+      - -Isrc/third-party/pico-sdk/src/rp2_common/cmsis/include
+      - -Isrc/third-party/pico-sdk/src/rp2_common/pico_platform/include
+      - -Isrc/third-party/pico-sdk/src/rp2_common/pico_stdio/include
+      - -Isrc/third-party/pico-sdk/src/rp2_common/hardware_gpio/include
+      - -Isrc/third-party/pico-sdk/src/rp2_common/hardware_base/include
+      - -Isrc/third-party/pico-sdk/src/rp2_common/hardware_claim/include
+      - -Isrc/third-party/pico-sdk/src/rp2_common/hardware_irq/include
+      - -Isrc/third-party/pico-sdk/src/rp2_common/hardware_sync/include
+      - -Isrc/third-party/pico-sdk/src/rp2_common/hardware_timer/include
+      - -Isrc/third-party/pico-sdk/src/rp2_common/hardware_uart/include
+      - -Isrc/third-party/pico-sdk/src/rp2_common/hardware_clocks/include
+      - -Isrc/third-party/pico-sdk/src/rp2_common/hardware_resets/include
+      - -Isrc/third-party/pico-sdk/src/rp2_common/hardware_watchdog/include
+      - -Isrc/third-party/pico-sdk/src/rp2_common/hardware_pll/include
+      - -Isrc/third-party/pico-sdk/src/rp2_common/hardware_xosc/include
+      - -Isrc/third-party/pico-sdk/src/rp2040/hardware_regs/include
+      - -Isrc/third-party/pico-sdk/src/rp2040/hardware_structs/include
+
+  - name: pi_pico_w
+    chip: rp2040
+    extra_dirs: *pico_dirs
+    extra_cflags: *pico_cflags
+  - name: xiao_rp2040
+    chip: rp2040
+    extra_dirs: *pico_dirs
+    extra_cflags: *pico_cflags
