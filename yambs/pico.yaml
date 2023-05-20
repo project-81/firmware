@@ -14,7 +14,6 @@ boards:
 
   - name: pi_pico
     chip: rp2040
-    uf2_family: RP2040
     ldflags: &pico_ldflags
       - -Tsrc/third-party/pico-sdk/src/rp2_common/pico_standard_link/memmap_default.ld
     extra_dirs: &pico_dirs
