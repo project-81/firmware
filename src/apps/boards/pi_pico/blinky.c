@@ -1,19 +1,31 @@
 #include <stdio.h>
+
 #include "pico/stdlib.h"
 
-int main() {
-    const uint LED_PIN = PICO_DEFAULT_LED_PIN;
-    gpio_init(LED_PIN);
-    gpio_set_dir(LED_PIN, GPIO_OUT);
+int main()
+{
+    /* Default LED pin. */
+    const uint led_pin = 25;
 
-    stdio_init_all();
+    gpio_init(led_pin);
+    gpio_set_dir(led_pin, GPIO_OUT);
 
-    while (true) {
-        gpio_put(LED_PIN, 1);
+    /* Default settings. */
+    stdio_uart_init_full(uart0, 115200, 0, 1);
+
+    while (true)
+    {
+        gpio_put(led_pin, 1);
         sleep_ms(100);
-        gpio_put(LED_PIN, 0);
+        gpio_put(led_pin, 0);
         sleep_ms(100);
 
-        printf("Hello, world!\n");
+        int result = getchar_timeout_us(0);
+        if (result >= 0)
+        {
+            printf("%c", result);
+        }
+
+        printf("Hello, world!\r\n");
     }
 }
