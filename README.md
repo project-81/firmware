@@ -11,11 +11,14 @@ takes care of all prerequisites.*
 ### Required
 
 * [crosstool-ng](https://crosstool-ng.github.io/) (`ct-ng`)
-* [python](https://github.com/python/cpython)
+* [python](https://github.com/python/cpython) (3.11 or newer recommended)
+* [vmklib](https://github.com/vkottler/vmklib) (`mk`, install via `pip`)
+* [yambs](https://github.com/vkottler/yambs) (`mbs`, install via `pip`)
 
 ### Optional
 
 * [ctags](https://github.com/universal-ctags/ctags)
+* [picotool](https://github.com/raspberrypi/picotool)
 
 ## Resources
 

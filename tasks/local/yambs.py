@@ -34,6 +34,6 @@ class GenerateNinja(SubprocessLogMixin):
 def register_yambs(manager: TaskManager, root: Path) -> bool:
     """Register crosstool tasks."""
 
-    manager.register(GenerateNinja("g", root), [])
-    manager.register(GenerateNinja("gw", root, watch=True), [])
+    manager.register(GenerateNinja("g", root), ["deps"])
+    manager.register(GenerateNinja("gw", root, watch=True), ["deps"])
     return True
