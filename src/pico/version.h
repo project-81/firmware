@@ -1,9 +1,6 @@
-#ifndef _PICO_VERSION_H
-#define _PICO_VERSION_H
+#pragma once
 
 #define PICO_SDK_VERSION_MAJOR 0
-#define PICO_SDK_VERSION_MINOR 1
+#define PICO_SDK_VERSION_MINOR 0
 #define PICO_SDK_VERSION_REVISION 0
-#define PICO_SDK_VERSION_STRING "0.1.0"
-
-#endif
+#define PICO_SDK_VERSION_STRING ""

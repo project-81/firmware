@@ -1,48 +1,77 @@
+/* toolchain */
 #include <stdio.h>
 
-#include "pico/bootrom.h"
-#include "pico/stdlib.h"
+/* internal */
+#include "chips/rp2040/common.h"
 
-void reset_bootloader()
+/* third-party */
+#include "hardware/gpio.h"
+#include "hardware/regs/clocks.h"
+#include "hardware/uart.h"
+#include "pico/time.h"
+
+void app(uint led_pin)
 {
-    rom_reset_usb_boot_fn func =
-        (rom_reset_usb_boot_fn)rom_func_lookup(ROM_FUNC_RESET_USB_BOOT);
-    func(0, 0);
-}
+    dump_clocks();
 
-int main()
-{
-    /* Default LED pin. */
-    const uint led_pin = 25;
+    unsigned int iterations = 0;
+    bool led_state = true;
+    bool app = true;
 
-    gpio_init(led_pin);
-    gpio_set_dir(led_pin, GPIO_OUT);
-
-    /* Default settings. */
-    stdio_uart_init_full(uart0, 115200, 0, 1);
-
-    printf("Program start.\r\n");
-
-    int iterations = 0;
-    while (true)
+    while (app)
     {
-        gpio_put(led_pin, 1);
-        sleep_ms(50);
-        gpio_put(led_pin, 0);
-        sleep_ms(50);
+        gpio_put(led_pin, led_state);
+        led_state = !led_state;
 
-        int result = getchar_timeout_us(0);
-        if (result >= 0)
+        sleep_until(delayed_by_us(get_absolute_time(), 100 * 1000));
+
+        if (uart_is_readable(uart0))
         {
-            printf("got: '%c' (%d)\r\n", result, result);
-            if (result == 113) /* 'q' */
+            char result = uart_getc(uart0);
+            switch (result)
             {
+            case 113: /* 'q' */
                 printf("Rebooting.\r\n");
                 reset_bootloader();
+                break;
+
+            case 114: /* 'r' */
+                printf("Restarting app.\r\n");
+                app = false;
+                break;
+
+            default:
+                printf("got: '%c' (%d)\r\n", result, result);
             }
         }
 
-        printf("Hello, world! (%d)\r\n", iterations);
+        if (iterations % 20 == 0)
+        {
+            printf("Hello, world! (%d)\r\n", iterations);
+        }
         iterations++;
+    }
+}
+
+void init(uint led_pin)
+{
+    gpio_init(led_pin);
+    gpio_set_dir(led_pin, GPIO_OUT);
+
+    /* Initialize UART pins and peripheral. */
+    gpio_set_function(0, GPIO_FUNC_UART);
+    gpio_set_function(1, GPIO_FUNC_UART);
+    uart_init(uart0, 115200);
+}
+
+int main(void)
+{
+    /* Default LED pin. */
+    const uint led_pin = 25;
+    init(led_pin);
+
+    while (true)
+    {
+        app(led_pin);
     }
 }

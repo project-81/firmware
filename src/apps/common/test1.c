@@ -1,3 +1,4 @@
+/* internal */
 #include "common/sample1.h"
 #include "common/sample2.h"
 

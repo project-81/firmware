@@ -1,3 +1,4 @@
+/* internal */
 #include "sample1.h"
 
 void sample1_method(void)
