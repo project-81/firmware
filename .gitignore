@@ -12,3 +12,4 @@ third-party
 .ninja*
 *.old
 compile_commands.json
+deploy.json

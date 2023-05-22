@@ -16,7 +16,7 @@ def register_boards(manager: TaskManager, third_party: Path) -> bool:
     """Register all board tasks."""
 
     # Should just read top-level config directly.
-    for board in ["relax_kit", "grand_central"]:
+    for board in ["relax_kit", "grand_central", "pi_pico"]:
         assert manager.register(jlink_gdbserver_task(board, third_party), [])
 
     return True

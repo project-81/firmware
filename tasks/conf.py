@@ -10,11 +10,13 @@ from typing import Dict
 # third-party
 from vcorelib.task import Phony
 from vcorelib.task.manager import TaskManager
+from yambs.config import load
 
 # internal
 from local.boards import register_boards
 from local.common import PATHS, add_path
 from local.crosstool import register_crosstool
+from local.deploy import register_deploy
 from local.gdbgui import register_gdbgui
 from local.git import register_git
 from local.jlink import register_jlink
@@ -34,7 +36,6 @@ def register(
     """Register project tasks to the manager."""
 
     third_party = cwd.joinpath("third-party")
-    third_party.mkdir(parents=True, exist_ok=True)
     third_party.joinpath("tarballs").mkdir(parents=True, exist_ok=True)
 
     # Ensure scripts in the virtual environment are available on the path.
@@ -56,15 +57,21 @@ def register(
     ]:
         assert reg(manager, third_party), reg
 
-    assert register_crosstool(manager, cwd)
-    assert register_yambs(manager, cwd)
+    for cwd_reg in [register_crosstool, register_yambs]:
+        assert cwd_reg(manager, cwd), cwd_reg
+
+    assert register_deploy(manager, load()), register_deploy
 
     manager.register(
         Phony("third-party-clones"),
-        ["github-shallow-clone.Cherrg.gdbgui-fix_447"],
+        [
+            "github-shallow-clone.Cherrg.gdbgui-fix_447",
+            "github-clone.raspberrypi.pico-sdk",
+            "github-clone.raspberrypi.pico-examples",
+        ],
     )
 
-    manager.register(Phony("deps"), ["toolchains"])
+    manager.register(Phony("deps"), ["toolchains", "build-ninja"])
 
     del project
 

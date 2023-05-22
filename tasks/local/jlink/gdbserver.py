@@ -13,6 +13,7 @@ SWD_COMMON = ["-if", "SWD", "-speed", "auto"]
 BOARD_ARGS = {
     "relax_kit": ["-device", "XMC4700-2048"] + SWD_COMMON,
     "grand_central": ["-device", "ATSAMD51P20A"] + SWD_COMMON,
+    "pi_pico": ["-device", "RP2040_M0_0"] + SWD_COMMON,
 }
 
 PORTS = {"gdb": 2331, "swo": 2332, "telnet": 2333, "rtt": 19021}

@@ -3,5 +3,5 @@
 # gdbgui
 nox
 
-yambs
+yambs>=1.4.2
 vmklib

@@ -8,12 +8,26 @@ $(error target this Makefile with 'mk', not '$(MAKE)' ($(MK_INFO)))
 endif
 ###############################################################################
 
-.PHONY: compdb clean clean-toolchains host-jlink-docs
+.PHONY: t compdb clean clean-toolchains host-jlink-docs
+
+THIRD_PARTY := $($(PROJ)_DIR)/third-party
+
+CTAGS_ARGS := -f tags --languages=C,C++
+
+t:
+	rm -f $($(PROJ)_DIR)/tags
+	cd $($(PROJ)_DIR) && ctags $(CTAGS_ARGS) \
+		--exclude=src/third-party -R src
+	cd $($(PROJ)_DIR) && ctags $(CTAGS_ARGS) -a \
+		-R third-party/pico-sdk/src
+	cd $($(PROJ)_DIR) && ctags $(CTAGS_ARGS) -a \
+		-R third-party/picolibc/picolibc/newlib/libc/tinystdio
+
+edit: t compdb
+	cd $($(PROJ)_DIR) && $(EDITOR)
 
 compdb:
 	ninja -t compdb > compile_commands.json
-
-THIRD_PARTY := $($(PROJ)_DIR)/third-party
 
 host-jlink-docs:
 	cd $(THIRD_PARTY)/jlink/Doc/Manuals && python -m http.server 0

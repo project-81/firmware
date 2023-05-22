@@ -1,4 +1,7 @@
 ---
+includes:
+  - yambs/pico.yaml
+
 boards:
   - name: relax_kit
     chip: xmc4700-2048
@@ -6,10 +9,16 @@ boards:
   - name: grand_central
     chip: atsamd51x20
 
+#
 # https://github.com/adafruit/uf2-samdx1/blob/master/inc/uf2format.h#L14-L17
+#
 # Because we're using the Adafruit board with UF2 bootloader, try to play
 # nice with it and create an application that can be co-located with the
 # bootloader.
+#
+# The only alternative would be to update the board with a modified version of
+# the "self-updating" bootloader that disables the write protection.
+#
 chips:
   atsamd51x20:
     linker:
