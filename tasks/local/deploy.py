@@ -74,7 +74,7 @@ class Deploy(SubprocessLogMixin):
             assert await self.exec("ninja")
 
         # Perform the update.
-        if "pico" in result[0]:
+        if "pico" in result[0] or "xiao" in result[0]:
             assert await self.exec(
                 "picotool", "load", str(result[1].with_suffix(".uf2"))
             )

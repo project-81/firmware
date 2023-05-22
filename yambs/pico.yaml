@@ -1,17 +1,5 @@
 ---
 boards:
-  # - name: pi_pico_w
-  #   chip: rp2040
-  #   ldflags: *pico_ldflags
-  #   extra_dirs: *pico_dirs
-  #   extra_cflags: *pico_cflags
-
-  # - name: xiao_rp2040
-  #   chip: rp2040
-  #   ldflags: *pico_ldflags
-  #   extra_dirs: *pico_dirs
-  #   extra_cflags: *pico_cflags
-
   - name: pi_pico
     chip: rp2040
     ldflags: &pico_ldflags
@@ -62,3 +50,15 @@ boards:
       - -Isrc/third-party/pico-sdk/src/rp2_common/hardware_xosc/include
       - -Isrc/third-party/pico-sdk/src/rp2040/hardware_regs/include
       - -Isrc/third-party/pico-sdk/src/rp2040/hardware_structs/include
+
+  - name: pi_pico_w
+    chip: rp2040
+    ldflags: *pico_ldflags
+    extra_dirs: *pico_dirs
+    extra_cflags: *pico_cflags
+
+  - name: xiao
+    chip: rp2040
+    ldflags: *pico_ldflags
+    extra_dirs: *pico_dirs
+    extra_cflags: *pico_cflags
