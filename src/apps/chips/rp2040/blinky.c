@@ -10,18 +10,21 @@
 #include "hardware/uart.h"
 #include "pico/time.h"
 
+static inline void gpio_toggle(uint gpio)
+{
+    gpio_xor_mask(1u << gpio);
+}
+
 void app(uint led_pin)
 {
     dump_clocks();
 
     unsigned int iterations = 0;
-    bool led_state = true;
     bool app = true;
 
     while (app)
     {
-        gpio_put(led_pin, led_state);
-        led_state = !led_state;
+        gpio_toggle(led_pin);
 
         sleep_until(delayed_by_us(get_absolute_time(), 100 * 1000));
 
