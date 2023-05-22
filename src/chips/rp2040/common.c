@@ -6,13 +6,27 @@
 
 /* third-party */
 #include "hardware/clocks.h"
+#include "hardware/structs/scb.h"
 #include "pico/bootrom.h"
 
-void reset_bootloader()
+__attribute__((noreturn)) void reset(bool bootloader)
 {
-    rom_reset_usb_boot_fn func =
-        (rom_reset_usb_boot_fn)rom_func_lookup(ROM_FUNC_RESET_USB_BOOT);
-    func(0, 0);
+    if (bootloader)
+    {
+        rom_reset_usb_boot_fn func =
+            (rom_reset_usb_boot_fn)rom_func_lookup(ROM_FUNC_RESET_USB_BOOT);
+        func(0, 0);
+    }
+    else
+    {
+        /* Perform a reset via the Application Interrupt and Reset Control
+         * Register. */
+        scb_hw->aircr = (0x05FA << M0PLUS_AIRCR_VECTKEY_LSB) |
+                        M0PLUS_AIRCR_SYSRESETREQ_BITS;
+    }
+
+    tight_loop_contents();
+    __builtin_unreachable();
 }
 
 void dump_clocks()

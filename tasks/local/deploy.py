@@ -69,9 +69,8 @@ class Deploy(SubprocessLogMixin):
         if result is None:
             return False
 
-        # Build the applications if they're not present.
-        if not result[1].with_suffix(".elf").is_file():
-            assert await self.exec("ninja")
+        # Always attempt to build.
+        assert await self.exec("ninja")
 
         # Perform the update.
         if "pico" in result[0] or "xiao" in result[0]:
