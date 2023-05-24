@@ -15,14 +15,21 @@ from vmklib.tasks.mixins.concrete import ConcreteOnceMixin
 MAKE_NPROCS = f"-j{cpu_count()}"
 
 
-class ThirdPartyConfigure(ConcreteOnceMixin, SubprocessLogMixin):
-    """A class implementing a task for building './configure' projects."""
-
-    default_requirements = {"vmklib.init", "third-party-clones"}
+class ShellCmdInDirMixin(SubprocessLogMixin):
+    """
+    A mixin that adds a method for running a shell command from a specific
+    directory.
+    """
 
     async def shell_cmd_in_dir(self, path: Path, cmd: List[str]) -> bool:
         """Run a shell command in a specific directory."""
         return await self.shell(f'( cd "{path}"; {" ".join(cmd)} )')
+
+
+class ThirdPartyConfigure(ConcreteOnceMixin, ShellCmdInDirMixin):
+    """A class implementing a task for building './configure' projects."""
+
+    default_requirements = {"vmklib.init", "third-party-clones"}
 
     async def run(self, inbox: Inbox, outbox: Outbox, *args, **kwargs) -> bool:
         """Build a third-party dependency."""

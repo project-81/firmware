@@ -6,15 +6,15 @@ A module for project-specific SEGGER J-Link tasks.
 from pathlib import Path
 from typing import Optional
 
-# internal
-from local.common import add_path, add_program_path
-from local.udev import install_udev_rule
-
 # third-party
 from vcorelib.io.archive import extractall
 from vcorelib.task import Inbox, Outbox
 from vcorelib.task.manager import TaskManager
 from vcorelib.task.subprocess.run import SubprocessLogMixin
+
+# internal
+from local.common import add_path, add_program_path
+from local.udev import install_udev_rule
 
 JLINK_URL = "https://www.segger.com/downloads/jlink"
 

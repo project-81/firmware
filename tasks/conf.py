@@ -20,6 +20,7 @@ from local.deploy import register_deploy
 from local.gdbgui import register_gdbgui
 from local.git import register_git
 from local.jlink import register_jlink
+from local.logic import register_logic
 from local.native import register_native
 from local.ninja import register_ninja
 from local.node import register_node
@@ -54,6 +55,7 @@ def register(
         register_openocd,
         register_gdbgui,
         register_jlink,
+        register_logic,
         register_boards,
     ]:
         assert reg(manager, third_party), reg

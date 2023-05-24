@@ -5,3 +5,4 @@ nox
 
 yambs>=1.4.2
 vmklib
+vcorelib>=1.6.6
