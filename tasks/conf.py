@@ -20,6 +20,7 @@ from local.deploy import register_deploy
 from local.gdbgui import register_gdbgui
 from local.git import register_git
 from local.jlink import register_jlink
+from local.native import register_native
 from local.ninja import register_ninja
 from local.node import register_node
 from local.openocd import register_openocd
@@ -60,7 +61,9 @@ def register(
     for cwd_reg in [register_crosstool, register_yambs]:
         assert cwd_reg(manager, cwd), cwd_reg
 
-    assert register_deploy(manager, load()), register_deploy
+    config = load()
+    for config_reg in [register_deploy, register_native]:
+        assert config_reg(manager, config), config_reg
 
     manager.register(
         Phony("third-party-clones"),
