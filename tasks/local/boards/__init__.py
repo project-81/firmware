@@ -13,6 +13,8 @@ from vcorelib.task.subprocess.run import SubprocessLogMixin
 from yambs.config import Config
 
 # internal
+from local.boards.pico import PIOASM_DIR, BuildPioasm
+from local.common import add_program_path
 from local.jlink.gdbserver import jlink_gdbserver_task
 from local.prompts import manual_select
 
@@ -23,6 +25,12 @@ def register_boards(manager: TaskManager, third_party: Path) -> bool:
     # Should just read top-level config directly.
     for board in ["relax_kit", "grand_central", "pi_pico"]:
         assert manager.register(jlink_gdbserver_task(board, third_party), [])
+
+    manager.register(
+        BuildPioasm("pioasm", third_party),
+        ["third-party-clones", "build-ninja"],
+    )
+    add_program_path("pioasm", third_party, *PIOASM_DIR, "build", "pioasm")
 
     return True
 

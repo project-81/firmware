@@ -76,7 +76,7 @@ def register(
         ],
     )
 
-    manager.register(Phony("deps"), ["toolchains", "build-ninja"])
+    manager.register(Phony("deps"), ["toolchains", "pioasm"])
 
     del project
 

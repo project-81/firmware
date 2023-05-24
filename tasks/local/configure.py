@@ -23,6 +23,8 @@ class ShellCmdInDirMixin(SubprocessLogMixin):
 
     async def shell_cmd_in_dir(self, path: Path, cmd: List[str]) -> bool:
         """Run a shell command in a specific directory."""
+
+        path.mkdir(exist_ok=True)
         return await self.shell(f'( cd "{path}"; {" ".join(cmd)} )')
 
 
