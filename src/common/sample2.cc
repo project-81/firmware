@@ -1,6 +1,8 @@
 /* internal */
 #include "sample2.h"
 
+namespace Project81
+{
 void sample2_method(void)
 {
     int a = 0;
@@ -9,3 +11,4 @@ void sample2_method(void)
         a *= 4;
     }
 }
+}; // namespace Project81

@@ -14,8 +14,8 @@ int main(void)
 {
     test1(1, 2);
 
-    sample1_method();
-    sample2_method();
+    Project81::sample1_method();
+    Project81::sample2_method();
 
     float a = 0.0f;
     for (int i = 0; i < 1000; i++)
