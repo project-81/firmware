@@ -19,7 +19,11 @@ def add_path(path: Path) -> None:
 
 
 def add_program_path(
-    program: str, third_party: Path, *parts: str, update_path: bool = False
+    program: str,
+    third_party: Path,
+    *parts: str,
+    update_path: bool = False,
+    local_bin: bool = False
 ) -> None:
     """Register a path to a program."""
 
@@ -29,9 +33,33 @@ def add_program_path(
     if update_path:
         add_path(prog.parent)
 
+    if local_bin:
+        link_local_bin(prog)
+
     PATHS[program] = prog
 
 
 def program_str(program: str) -> str:
     """Get a string path to a program."""
     return str(PATHS[program])
+
+
+PREFIX = Path.home().joinpath(".local")
+
+
+def local_bin(program: str) -> Path:
+    """Get the path to a local binary."""
+    return PREFIX.joinpath("bin", program)
+
+
+def is_local_bin(program: str) -> bool:
+    """Determine if a binary or entry script is installed locally."""
+    return local_bin(program).is_file()
+
+
+def link_local_bin(path: Path) -> None:
+    """Link a local binary from some arbitrary location."""
+
+    prog = path.name
+    if not is_local_bin(prog):
+        local_bin(prog).symlink_to(path.resolve())

@@ -13,3 +13,4 @@ third-party
 *.old
 compile_commands.json
 deploy.json
+src/generated

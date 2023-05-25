@@ -38,6 +38,7 @@ clean: clean-compile-arm-picolibc-eabi clean-compile-arm-none-eabi
 	ninja -t clean
 	ninja -t cleandead
 	rm -f $($(PROJ)_DIR)/compile_commands.json
+	rm -rf $($(PROJ)_DIR)/src/generated/*
 
 clean-toolchain-%:
 	rm -rf $(TOOLCHAINS)/$*/build* $(TOOLCHAINS)/$*/include

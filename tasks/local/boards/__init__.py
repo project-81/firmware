@@ -30,7 +30,15 @@ def register_boards(manager: TaskManager, third_party: Path) -> bool:
         BuildPioasm("pioasm", third_party),
         ["third-party-clones", "build-ninja"],
     )
-    add_program_path("pioasm", third_party, *PIOASM_DIR, "build", "pioasm")
+    add_program_path(
+        "pioasm",
+        third_party,
+        *PIOASM_DIR,
+        "build",
+        "pioasm",
+        update_path=True,
+        local_bin=True
+    )
 
     return True
 
