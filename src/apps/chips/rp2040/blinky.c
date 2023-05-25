@@ -3,8 +3,10 @@
 
 /* internal */
 #include "chips/rp2040/common.h"
+#include "generated/chips/rp2040/ws2812.h"
 
 /* third-party */
+#include "hardware/clocks.h"
 #include "hardware/gpio.h"
 #include "hardware/regs/clocks.h"
 #include "hardware/structs/scb.h"
@@ -46,12 +48,27 @@ bool poll_input(void)
     return result;
 }
 
+const PIO pio = pio0;
+const uint sm = 0;
+
+void put_pixel(uint32_t pixel_grb)
+{
+    pio_sm_put_blocking(pio, sm, pixel_grb << 8u);
+}
+
+uint32_t urgb_u32(uint8_t r, uint8_t g, uint8_t b)
+{
+    return ((uint32_t)(r) << 8) | ((uint32_t)(g) << 16) | (uint32_t)(b);
+}
+
 void app(uint led_pin)
 {
     dump_clocks();
 
     unsigned int iterations = 0;
     bool app = true;
+
+    uint8_t color_val = 0;
 
     while (app)
     {
@@ -61,6 +78,15 @@ void app(uint led_pin)
         sleep_until(delayed_by_us(get_absolute_time(), 100 * 1000));
 
         app = poll_input();
+
+        for (uint8_t i = 0; i < 2; i++)
+        {
+            put_pixel(urgb_u32(color_val, 0, 0));
+            put_pixel(urgb_u32(0, color_val, 0));
+            put_pixel(urgb_u32(0, 0, color_val));
+        }
+
+        color_val += 10;
 
         /* UART heartbeat. */
         if (iterations % 20 == 0)
@@ -80,6 +106,9 @@ void init(uint led_pin)
     gpio_set_function(0, GPIO_FUNC_UART);
     gpio_set_function(1, GPIO_FUNC_UART);
     uart_init(uart0, 115200);
+
+    /* Run a WS2812 LED driver in a PIO state machine. */
+    ws2812_program_init(pio, sm, 18, false);
 
     printf("\r\nInitialization comlete.\r\n");
 }

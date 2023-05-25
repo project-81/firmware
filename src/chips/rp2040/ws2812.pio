@@ -1,0 +1,23 @@
+.program ws2812
+.side_set 1
+
+; When looking at a logic analyzer, increasing the length of 'T1' from 2 to 3
+; and decreasing 'T2' from 5 to 4 improved the timing w.r.t the required
+; timing described by the datasheet.
+.define public T1 3
+.define public T2 4
+.define public T3 3
+
+.wrap_target
+bitloop:
+    out x, 1       side 0 [T3 - 1] ; Side-set still takes place when instruction stalls
+    jmp !x do_zero side 1 [T1 - 1] ; Branch on the bit we shifted out. Positive pulse
+do_one:
+    jmp  bitloop   side 1 [T2 - 1] ; Continue driving high, for a long pulse
+do_zero:
+    nop            side 0 [T2 - 1] ; Or drive low, for a short pulse
+.wrap
+
+% c-sdk {
+void ws2812_program_init(PIO pio, uint sm, uint pin, bool rgbw);
+%}

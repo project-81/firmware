@@ -8,6 +8,7 @@ boards:
       - pico-sdk/src/common/pico_time
       - pico-sdk/src/common/pico_util
       - pico-sdk/src/common/pico_sync
+      - pico-sdk/src/rp2_common/hardware_pio
       - pico-sdk/src/rp2_common/hardware_gpio
       - pico-sdk/src/rp2_common/hardware_irq
       - pico-sdk/src/rp2_common/hardware_timer
@@ -36,6 +37,7 @@ boards:
       - -Isrc/third-party/pico-sdk/src/rp2_common/pico_platform/include
       - -Isrc/third-party/pico-sdk/src/rp2_common/pico_printf/include
       - -Isrc/third-party/pico-sdk/src/rp2_common/pico_bootrom/include
+      - -Isrc/third-party/pico-sdk/src/rp2_common/hardware_pio/include
       - -Isrc/third-party/pico-sdk/src/rp2_common/hardware_gpio/include
       - -Isrc/third-party/pico-sdk/src/rp2_common/hardware_base/include
       - -Isrc/third-party/pico-sdk/src/rp2_common/hardware_claim/include
