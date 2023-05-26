@@ -11,7 +11,7 @@
 
 namespace Project81
 {
-__attribute__((noreturn)) void reset(bool bootloader)
+void reset(bool bootloader)
 {
     if (bootloader)
     {
