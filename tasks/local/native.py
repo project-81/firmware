@@ -9,6 +9,7 @@ from yambs.config import Config
 
 # internal
 from local.boards import BoardAppMixin
+from local.common import program_str
 
 
 class RunNativeApp(BoardAppMixin):
@@ -18,6 +19,9 @@ class RunNativeApp(BoardAppMixin):
         """Run a native application."""
 
         config: Config = args[0]
+
+        # Always build.
+        assert await self.exec(program_str("ninja"))
 
         result = await self.select_board_app(
             config,
@@ -29,7 +33,7 @@ class RunNativeApp(BoardAppMixin):
             return False
 
         exec_result = await self.exec(str(result[1].with_suffix(".elf")))
-        self.log.info("'%s' completed (%s).", result[1].name, result)
+        self.log.info("'%s' completed (%s).", result[1].name, exec_result)
 
         return exec_result
 
