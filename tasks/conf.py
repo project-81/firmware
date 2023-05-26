@@ -37,6 +37,8 @@ def register(
 ) -> bool:
     """Register project tasks to the manager."""
 
+    del substitutions
+
     third_party = cwd.joinpath("third-party")
     third_party.joinpath("tarballs").mkdir(parents=True, exist_ok=True)
 
@@ -77,6 +79,9 @@ def register(
     )
 
     manager.register(Phony("deps"), ["toolchains", "pioasm"])
+
+    # Default target.
+    manager.register(Phony("all"), ["gb"])
 
     del project
 

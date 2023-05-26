@@ -47,14 +47,14 @@ def program_str(program: str) -> str:
 PREFIX = Path.home().joinpath(".local")
 
 
-def local_bin(program: str) -> Path:
+def lbin(program: str) -> Path:
     """Get the path to a local binary."""
     return PREFIX.joinpath("bin", program)
 
 
 def is_local_bin(program: str) -> bool:
     """Determine if a binary or entry script is installed locally."""
-    return local_bin(program).is_file()
+    return lbin(program).is_file()
 
 
 def link_local_bin(path: Path) -> None:
@@ -62,4 +62,4 @@ def link_local_bin(path: Path) -> None:
 
     prog = path.name
     if not is_local_bin(prog):
-        local_bin(prog).symlink_to(path.resolve())
+        lbin(prog).symlink_to(path.resolve())

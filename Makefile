@@ -8,7 +8,7 @@ $(error target this Makefile with 'mk', not '$(MAKE)' ($(MK_INFO)))
 endif
 ###############################################################################
 
-.PHONY: t clean clean-toolchains host-jlink-docs
+.PHONY: all t clean clean-toolchains clean-compiles host-jlink-docs
 
 THIRD_PARTY := $($(PROJ)_DIR)/third-party
 
@@ -34,7 +34,12 @@ TOOLCHAINS := $($(PROJ)_DIR)/toolchains
 clean-compile-%:
 	rm -rf $(BUILD_DIR)/$*
 
-clean: clean-compile-arm-picolibc-eabi clean-compile-arm-none-eabi
+clean-compiles: clean-compile-arm-picolibc-eabi \
+                clean-compile-arm-none-eabi \
+                clean-compile-native \
+                clean-compile-coverage
+
+clean: clean-compiles
 	ninja -t clean
 	ninja -t cleandead
 	rm -f $($(PROJ)_DIR)/compile_commands.json

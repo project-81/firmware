@@ -1,7 +1,3 @@
-/* internal */
-#include "common/sample1.h"
-#include "common/sample2.h"
-
 int test2(int a, int b)
 {
     return a + b;
@@ -10,9 +6,6 @@ int test2(int a, int b)
 int main(void)
 {
     test2(1, 2);
-
-    Project81::sample1_method();
-    Project81::sample2_method();
 
     float a = 0.0f;
     for (int i = 0; i < 2000; i++)

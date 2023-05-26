@@ -8,7 +8,7 @@ from vcorelib.task.manager import TaskManager
 from yambs.config import Config
 
 # internal
-from local.boards import BoardAppMixin
+from local.mixin import BoardAppMixin
 
 
 class Deploy(BoardAppMixin):
