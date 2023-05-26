@@ -11,9 +11,9 @@ Source assets for embedded computers.
 
 ## System Dependencies
 
-*Note:
-[project-81 bootstrapping](https://github.com/project-81/workspace/blob/master/md/cloning-repositories.md)
-takes care of all prerequisites.*
+See
+[the wiki](https://github.com/project-81/firmware/wiki#getting-started)
+for notes on getting set up.
 
 ### Required
 
