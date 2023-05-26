@@ -5,27 +5,15 @@ A module implementing tasks for building projects that require ./configure'ing.
 # built-in
 from multiprocessing import cpu_count
 from pathlib import Path
-from typing import List
 
 # third-party
 from vcorelib.task import Inbox, Outbox
-from vcorelib.task.subprocess.run import SubprocessLogMixin
 from vmklib.tasks.mixins.concrete import ConcreteOnceMixin
 
+# internal
+from local.mixin import ShellCmdInDirMixin
+
 MAKE_NPROCS = f"-j{cpu_count()}"
-
-
-class ShellCmdInDirMixin(SubprocessLogMixin):
-    """
-    A mixin that adds a method for running a shell command from a specific
-    directory.
-    """
-
-    async def shell_cmd_in_dir(self, path: Path, cmd: List[str]) -> bool:
-        """Run a shell command in a specific directory."""
-
-        path.mkdir(exist_ok=True)
-        return await self.shell(f'( cd "{path}"; {" ".join(cmd)} )')
 
 
 class ThirdPartyConfigure(ConcreteOnceMixin, ShellCmdInDirMixin):

@@ -9,6 +9,11 @@ boards:
   - name: grand_central
     chip: atsamd51x20
 
+# Generate coverage reports for native builds.
+toolchains:
+  native:
+    extra_cflags: [-fprofile-arcs -ftest-coverage]
+
 #
 # https://github.com/adafruit/uf2-samdx1/blob/master/inc/uf2format.h#L14-L17
 #

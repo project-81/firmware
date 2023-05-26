@@ -10,7 +10,7 @@ from vcorelib.task import Inbox, Outbox
 from vmklib.tasks.mixins.concrete import ConcreteOnceMixin
 
 # internal
-from local.configure import ShellCmdInDirMixin
+from local.mixin import ShellCmdInDirMixin
 
 PIOASM_DIR = ["raspberrypi", "pico-sdk", "tools", "pioasm"]
 

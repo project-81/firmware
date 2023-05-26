@@ -2,6 +2,13 @@
 
 Source assets for embedded computers.
 
+## Targets
+
+### Native Builds
+
+* `mk n` - build, then run a `native` application
+* `mk nc` - build, then run a `native` application, then host code coverage
+
 ## System Dependencies
 
 *Note:

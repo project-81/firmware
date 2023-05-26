@@ -11,7 +11,7 @@ from vcorelib.task import Inbox, Outbox
 from vcorelib.task.manager import TaskManager
 
 # internal
-from local.configure import ShellCmdInDirMixin
+from local.mixin import ShellCmdInDirMixin
 
 LOGIC_VERSION = "2.4.7"
 LOGIC_IMAGE = f"Logic-{LOGIC_VERSION}-master.AppImage"

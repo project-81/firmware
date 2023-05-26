@@ -75,13 +75,16 @@ def manual_select(
             item_str += f" ({descriptions[option]})"
         print(item_str)
 
+    selection = None
+
     if not allow_prompt:
         print(f"not prompting and '{default}' not in options")
-        return None
+    else:
+        selection = select_option(options)
 
-    selection = select_option(options)
     if selection is None or selection < 0:
         return None
+
     if selection == custom_idx:
         if not allow_prompt:
             print("error: selected manual entry option but prompts disabled")

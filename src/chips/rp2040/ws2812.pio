@@ -19,5 +19,15 @@ do_zero:
 .wrap
 
 % c-sdk {
-void ws2812_program_init(PIO pio, uint sm, uint pin, bool rgbw);
+namespace Project81
+{
+struct ws2812_config
+{
+    uint pin;
+    bool rgbw = false;
+    float frequency = 800000.0f;
+};
+
+void ws2812_program_init(PIO pio, uint sm, const ws2812_config &config);
+}; // namespace Project81
 %}

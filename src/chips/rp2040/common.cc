@@ -9,6 +9,8 @@
 #include "hardware/structs/scb.h"
 #include "pico/bootrom.h"
 
+namespace Project81
+{
 __attribute__((noreturn)) void reset(bool bootloader)
 {
     if (bootloader)
@@ -48,3 +50,4 @@ void dump_clocks()
     printf("clk_rtc  = %lu kHz\r\n",
            frequency_count_khz(CLOCKS_FC0_SRC_VALUE_CLK_RTC));
 }
+}; // namespace Project81
