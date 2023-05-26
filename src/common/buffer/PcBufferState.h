@@ -27,24 +27,42 @@ class PcBufferState
         stats.reset();
     }
 
-    void increment_data()
+    bool increment_data(bool drop)
     {
-        data++;
-        if (data > stats.high_watermark)
-        {
-            stats.high_watermark = data;
-        }
-        space--;
+        bool result = space > 0;
 
-        stats.write_count++;
+        if (result)
+        {
+            data++;
+            if (data > stats.high_watermark)
+            {
+                stats.high_watermark = data;
+            }
+            space--;
+
+            stats.write_count++;
+        }
+        else if (drop)
+        {
+            stats.write_dropped++;
+        }
+
+        return result;
     }
 
-    void decrement_data()
+    bool decrement_data()
     {
-        data--;
-        space++;
+        bool result = data > 0;
 
-        stats.read_count++;
+        if (result)
+        {
+            data--;
+            space++;
+
+            stats.read_count++;
+        }
+
+        return result;
     }
 
     void poll_stats(PcBufferStats &update)

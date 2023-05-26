@@ -13,6 +13,8 @@ namespace Project81
 {
 void reset(bool bootloader)
 {
+    fflush(stdout);
+
     if (bootloader)
     {
         rom_reset_usb_boot_fn func =

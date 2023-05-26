@@ -37,13 +37,11 @@ template <std::size_t depth, typename element_t = std::uint8_t> class PcBuffer
 
     bool pop(element_t &elem)
     {
-        bool result = false;
+        bool result = state.decrement_data();
 
-        if (state.data > 0)
+        if (result)
         {
             elem = buffer[read_cursor++ % depth];
-            state.decrement_data();
-            result = true;
         }
 
         return result;
@@ -72,15 +70,13 @@ template <std::size_t depth, typename element_t = std::uint8_t> class PcBuffer
         return result;
     }
 
-    bool push(element_t elem)
+    bool push(element_t elem, bool drop = false)
     {
-        bool result = false;
+        bool result = state.increment_data(drop);
 
-        if (state.space > 0)
+        if (result)
         {
             buffer[write_cursor++ % depth] = elem;
-            state.increment_data();
-            result = true;
         }
 
         return result;

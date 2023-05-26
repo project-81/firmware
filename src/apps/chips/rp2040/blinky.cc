@@ -2,6 +2,7 @@
 #include <stdio.h>
 
 /* internal */
+#include "chips/rp2040/UartManager.h"
 #include "chips/rp2040/common.h"
 #include "generated/chips/rp2040/ws2812.h"
 
@@ -23,10 +24,10 @@ bool poll_input(void)
 {
     bool result = true;
 
-    if (uart_is_readable(uart0))
+    std::uint8_t data;
+    if (Project81::getc_nonblocking(data))
     {
-        char result = uart_getc(uart0);
-        switch (result)
+        switch (data)
         {
         case 'q':
             printf("Resetting to bootloader.\r\n");
@@ -42,7 +43,7 @@ bool poll_input(void)
             Project81::reset(false);
 
         default:
-            printf("got: '%c' (%d)\r\n", result, result);
+            printf("got: '%c' (%d)\r\n", data, data);
         }
     }
 
@@ -89,6 +90,8 @@ void app(void)
         sleep_until(delayed_by_us(get_absolute_time(), 100));
 
         app = poll_input();
+
+        Project81::service_stdio_uart();
 
         /* UART heartbeat. */
         if (iterations % 2000 == 0)
