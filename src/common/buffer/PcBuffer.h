@@ -2,6 +2,7 @@
 
 /* toolchain */
 #include <array>
+#include <cassert>
 #include <cstddef>
 #include <cstdint>
 #include <optional>
@@ -55,7 +56,7 @@ template <std::size_t depth, typename element_t = std::uint8_t> class PcBuffer
         {
             for (std::size_t i = 0; i < count; i++)
             {
-                pop(elem_array[i]);
+                assert(pop(elem_array[i]));
             }
             result = true;
         }
@@ -90,7 +91,7 @@ template <std::size_t depth, typename element_t = std::uint8_t> class PcBuffer
         {
             for (std::size_t i = 0; i < count; i++)
             {
-                push(elem_array[i]);
+                assert(push(elem_array[i]));
             }
             result = true;
         }

@@ -14,6 +14,8 @@ THIRD_PARTY := $($(PROJ)_DIR)/third-party
 
 CTAGS_ARGS := -f tags --languages=C,C++
 
+# cd $($(PROJ)_DIR) && ctags $(CTAGS_ARGS) -a \
+# 	-R third-party/json/single_include
 t:
 	rm -f $($(PROJ)_DIR)/tags
 	cd $($(PROJ)_DIR) && ctags $(CTAGS_ARGS) \

@@ -9,6 +9,13 @@
 #include "hardware/structs/scb.h"
 #include "pico/bootrom.h"
 
+extern "C" void __attribute__((noreturn)) _exit(int status)
+{
+    (void)status;
+    printf("Exiting %d.\n", status);
+    Project81::reset(true);
+}
+
 namespace Project81
 {
 void reset(bool bootloader)
@@ -35,21 +42,21 @@ void reset(bool bootloader)
 
 void dump_clocks()
 {
-    printf("pll_sys  = %lu kHz\r\n",
+    printf("pll_sys  = %lu kHz\n",
            frequency_count_khz(CLOCKS_FC0_SRC_VALUE_PLL_SYS_CLKSRC_PRIMARY));
-    printf("pll_usb  = %lu kHz\r\n",
+    printf("pll_usb  = %lu kHz\n",
            frequency_count_khz(CLOCKS_FC0_SRC_VALUE_PLL_USB_CLKSRC_PRIMARY));
-    printf("rosc     = %lu kHz\r\n",
+    printf("rosc     = %lu kHz\n",
            frequency_count_khz(CLOCKS_FC0_SRC_VALUE_ROSC_CLKSRC));
-    printf("clk_sys  = %lu kHz\r\n",
+    printf("clk_sys  = %lu kHz\n",
            frequency_count_khz(CLOCKS_FC0_SRC_VALUE_CLK_SYS));
-    printf("clk_peri = %lu kHz\r\n",
+    printf("clk_peri = %lu kHz\n",
            frequency_count_khz(CLOCKS_FC0_SRC_VALUE_CLK_PERI));
-    printf("clk_usb  = %lu kHz\r\n",
+    printf("clk_usb  = %lu kHz\n",
            frequency_count_khz(CLOCKS_FC0_SRC_VALUE_CLK_USB));
-    printf("clk_adc  = %lu kHz\r\n",
+    printf("clk_adc  = %lu kHz\n",
            frequency_count_khz(CLOCKS_FC0_SRC_VALUE_CLK_ADC));
-    printf("clk_rtc  = %lu kHz\r\n",
+    printf("clk_rtc  = %lu kHz\n",
            frequency_count_khz(CLOCKS_FC0_SRC_VALUE_CLK_RTC));
 }
 }; // namespace Project81

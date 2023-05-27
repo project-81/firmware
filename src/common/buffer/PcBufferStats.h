@@ -8,11 +8,11 @@ namespace Project81
 
 struct PcBufferStats
 {
-    std::size_t high_watermark = 0;
-    std::size_t read_count = 0;
-    std::size_t write_count = 0;
+    uint16_t high_watermark = 0;
+    uint32_t read_count = 0;
+    uint32_t write_count = 0;
 
-    std::size_t write_dropped = 0;
+    uint16_t write_dropped = 0;
 
     void reset()
     {

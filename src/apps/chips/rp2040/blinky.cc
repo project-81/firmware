@@ -30,20 +30,17 @@ bool poll_input(void)
         switch (data)
         {
         case 'q':
-            printf("Resetting to bootloader.\r\n");
+            printf("Resetting to bootloader.\n");
             Project81::reset(true);
 
         case 'r':
-            printf("Restarting app.\r\n");
+            printf("Restarting app.\n");
             result = false;
             break;
 
         case 'R':
-            printf("Resetting to app.\r\n");
+            printf("Resetting to app.\n");
             Project81::reset(false);
-
-        default:
-            printf("got: '%c' (%d)\r\n", data, data);
         }
     }
 
@@ -96,7 +93,7 @@ void app(void)
         /* UART heartbeat. */
         if (iterations % 2000 == 0)
         {
-            printf("Hello, world! (%d)\r\n", iterations);
+            printf("Hello, world! (%d)\n", iterations);
 
             for (uint8_t i = 0; i < 2; i++)
             {
@@ -113,8 +110,6 @@ void app(void)
 
 void init(uint led_pin)
 {
-    // alarm_pool_init_default();
-
     gpio_init(led_pin);
     gpio_set_dir(led_pin, GPIO_OUT);
 
@@ -126,7 +121,7 @@ void init(uint led_pin)
     /* Run a WS2812 LED driver in a PIO state machine. */
     Project81::ws2812_program_init(pio, sm, {.pin = 18});
 
-    printf("\r\nInitialization comlete.\r\n");
+    printf("\nInitialization comlete.\n");
 }
 
 int main(void)

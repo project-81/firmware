@@ -9,6 +9,8 @@ boards:
   - name: grand_central
     chip: atsamd51x20
 
+# common_cflags: [-Isrc/third-party/json/single_include]
+
 # Generate coverage reports for native builds.
 toolchains:
   native:

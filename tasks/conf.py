@@ -69,6 +69,7 @@ def register(
     for config_reg in [register_deploy, register_native]:
         assert config_reg(manager, config), config_reg
 
+    # "github-clone.nlohmann.json"
     manager.register(
         Phony("third-party-clones"),
         [

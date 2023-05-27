@@ -27,13 +27,15 @@ static FILE __stdio =
     FDEV_SETUP_STREAM(putc_wrapper, NULL, flush_wrapper, _FDEV_SETUP_WRITE);
 
 FILE *const stdout = &__stdio;
+FILE *const stdin = nullptr;
+FILE *const stderr = nullptr;
 
 void Project81::service_stdio_uart(void)
 {
     manager.dispatch();
 }
 
-bool Project81::getc_nonblocking(std::uint8_t &data)
+bool Project81::getc_nonblocking(uint8_t &data)
 {
     return manager.getc_nonblocking(data);
 }
