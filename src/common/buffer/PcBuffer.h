@@ -3,34 +3,53 @@
 /* toolchain */
 #include <array>
 #include <cassert>
-#include <cstddef>
-#include <cstdint>
-#include <optional>
+#include <cstring>
+#include <functional>
 
 /* internal */
+#include "common/buffer/CircularBuffer.h"
 #include "common/buffer/PcBufferState.h"
 
 namespace Project81
 {
 
-template <std::size_t depth, typename element_t = std::uint8_t> class PcBuffer
+template <std::size_t depth, typename element_t = uint8_t> class PcBuffer
 {
+    using ServiceCallback = std::function<void(PcBuffer<depth, element_t> *)>;
+
   public:
-    PcBuffer() : state(depth), buffer(), write_cursor(0), read_cursor(0)
+    PcBuffer(ServiceCallback _space_available = nullptr,
+             ServiceCallback _data_available = nullptr)
+        : state(depth), buffer(), space_available(_space_available),
+          data_available(_data_available)
     {
     }
 
-    bool empty()
+    void set_space_available(ServiceCallback _space_available)
+    {
+        /* Don't allow double assignment. */
+        assert(_space_available && space_available == nullptr);
+        space_available = _space_available;
+    }
+
+    void set_data_available(ServiceCallback _data_available)
+    {
+        /* Don't allow double assignment. */
+        assert(_data_available && data_available == nullptr);
+        data_available = _data_available;
+    }
+
+    inline bool empty()
     {
         return state.data == 0;
     }
 
-    bool full()
+    inline bool full()
     {
         return state.space == 0;
     }
 
-    void clear()
+    inline void clear()
     {
         /* Reset state. */
         state.reset();
@@ -42,7 +61,8 @@ template <std::size_t depth, typename element_t = std::uint8_t> class PcBuffer
 
         if (result)
         {
-            elem = buffer[read_cursor++ % depth];
+            buffer.read_single(elem);
+            service_space();
         }
 
         return result;
@@ -50,15 +70,12 @@ template <std::size_t depth, typename element_t = std::uint8_t> class PcBuffer
 
     bool pop_n(element_t *elem_array, std::size_t count)
     {
-        bool result = false;
+        bool result = state.decrement_data(count);
 
-        if (state.data >= count)
+        if (result)
         {
-            for (std::size_t i = 0; i < count; i++)
-            {
-                assert(pop(elem_array[i]));
-            }
-            result = true;
+            buffer.read_n(elem_array, count);
+            service_space();
         }
 
         return result;
@@ -67,45 +84,107 @@ template <std::size_t depth, typename element_t = std::uint8_t> class PcBuffer
     std::size_t pop_all(element_t *elem_array)
     {
         std::size_t result = state.data;
-        pop_n(elem_array, result);
+        if (result)
+        {
+            assert(pop_n(elem_array, result));
+        }
         return result;
     }
 
-    bool push(element_t elem, bool drop = false)
+    bool push(const element_t elem, bool drop = false)
     {
         bool result = state.increment_data(drop);
 
         if (result)
         {
-            buffer[write_cursor++ % depth] = elem;
+            buffer.write_single(elem);
+            service_data();
         }
 
         return result;
     }
 
-    bool push_n(const element_t *elem_array, std::size_t count)
+    void push_blocking(const element_t elem)
     {
-        bool result = false;
-
-        if (state.space >= count)
+        while (full())
         {
-            for (std::size_t i = 0; i < count; i++)
-            {
-                assert(push(elem_array[i]));
-            }
-            result = true;
+            service_data(true);
+        }
+
+        assert(push(elem));
+    }
+
+    void flush(void)
+    {
+        while (!empty())
+        {
+            service_data(true);
+        }
+    }
+
+    bool push_n(const element_t *elem_array, std::size_t count,
+                bool drop = false)
+    {
+        bool result = state.increment_data(drop, count);
+
+        if (result)
+        {
+            buffer.write_n(elem_array, count);
+            service_data();
         }
 
         return result;
+    }
+
+    void push_n_blocking(const element_t *elem_array, std::size_t count)
+    {
+        std::size_t chunk;
+        while (count)
+        {
+            chunk = std::min(depth, count);
+
+            while (!state.has_enough_space(chunk))
+            {
+                service_data(true);
+            }
+
+            assert(push_n(elem_array, chunk));
+            elem_array += chunk;
+            count -= chunk;
+        }
     }
 
     PcBufferState state;
 
   protected:
-    std::array<element_t, depth> buffer;
+    CircularBuffer<depth, element_t> buffer;
 
-    std::size_t write_cursor;
-    std::size_t read_cursor;
+    ServiceCallback space_available;
+    ServiceCallback data_available;
+
+    inline void service_data(bool required = false)
+    {
+        if (data_available)
+        {
+            data_available(this);
+        }
+        else
+        {
+            assert(not required);
+        }
+    }
+
+    inline void service_space(bool required = false)
+    {
+        if (space_available)
+        {
+            space_available(this);
+        }
+        else
+        {
+            assert(not required);
+        }
+    }
 };
 
 } // namespace Project81

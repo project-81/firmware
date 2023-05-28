@@ -16,30 +16,89 @@ namespace Project81
  * Since a UART inevitably plays a role in standard input/output,
  * forward-declare some functions for implementing the desired behavior.
  */
-void service_stdio_uart(void);
 bool getc_nonblocking(uint8_t &data);
 
 template <size_t tx_depth, size_t rx_depth> class UartManager
 {
+    using TxBuffer = PcBuffer<tx_depth>;
+    using RxBuffer = PcBuffer<rx_depth>;
+
   public:
     UartManager(uart_inst_t *_uart, bool _echo = true,
                 bool _add_carriage_return = true)
         : tx_buffer(), rx_buffer(), uart(_uart), echo(_echo),
           add_carriage_return(_add_carriage_return)
     {
+        /*
+         * When data becomes available in the transmit buffer, service the TX
+         * end (in case the UART has TX FIFO space).
+         */
+        tx_buffer.set_data_available([this](TxBuffer *buf) {
+            (void)buf;
+            service_tx();
+        });
+
+        /*
+         * When space in the receive buffer is available, attempt to popupate
+         * it with new data if the UART has received any.
+         */
+        rx_buffer.set_space_available([this](RxBuffer *buf) {
+            (void)buf;
+            service_rx();
+        });
     }
 
-    void dispatch(void)
+    void putc_block(uint8_t data)
     {
-        /* Service TX direction. */
+        switch (data)
+        {
+        case '\n':
+            /* If we should add carriage returns, add it first. */
+            if (add_carriage_return)
+            {
+                putc_block('\r');
+            }
+            break;
+        }
+
+        tx_buffer.push_blocking(data);
+    }
+
+    void flush(void)
+    {
+        tx_buffer.flush();
+
+        /* Wait for UART to be completely empty. */
+        uart_tx_wait_blocking(uart);
+    }
+
+    bool getc_nonblocking(uint8_t &data)
+    {
+        /* Use this as an opportunity to service the receive buffer. */
+        service_rx();
+        return rx_buffer.pop(data);
+    }
+
+  protected:
+    TxBuffer tx_buffer;
+    RxBuffer rx_buffer;
+    uart_inst_t *uart;
+    bool echo;
+    bool add_carriage_return;
+
+    void service_tx(void)
+    {
         uint8_t data;
         while (uart_is_writable(uart) and !tx_buffer.empty())
         {
             assert(tx_buffer.pop(data));
             uart_get_hw(uart)->dr = data;
         }
+    }
 
-        /* Service RX direction. */
+    void service_rx(void)
+    {
+        uint8_t data;
         while (uart_is_readable(uart) and !rx_buffer.full())
         {
             data = uart_getc(uart);
@@ -50,7 +109,7 @@ template <size_t tx_depth, size_t rx_depth> class UartManager
                 switch (data)
                 {
                 case '\r':
-                    putc_block_if_full('\n');
+                    putc_block('\n');
 
                     /*
                      * If carriage returns are getting added automatically,
@@ -63,55 +122,11 @@ template <size_t tx_depth, size_t rx_depth> class UartManager
 
                     [[fallthrough]];
                 default:
-                    putc_block_if_full(data);
+                    putc_block(data);
                 }
             }
         }
     }
-
-    void putc_block_if_full(uint8_t data)
-    {
-        switch (data)
-        {
-        case '\n':
-            /* If we should add carriage returns, add it first. */
-            if (add_carriage_return)
-            {
-                putc_block_if_full('\r');
-            }
-            break;
-        }
-
-        while (tx_buffer.full())
-        {
-            dispatch();
-        }
-
-        assert(tx_buffer.push(data));
-    }
-
-    void flush(void)
-    {
-        while (!tx_buffer.empty())
-        {
-            dispatch();
-        }
-
-        /* Wait for UART to be completely empty. */
-        uart_tx_wait_blocking(uart);
-    }
-
-    bool getc_nonblocking(uint8_t &data)
-    {
-        return rx_buffer.pop(data);
-    }
-
-  protected:
-    PcBuffer<tx_depth> tx_buffer;
-    PcBuffer<rx_depth> rx_buffer;
-    uart_inst_t *uart;
-    bool echo;
-    bool add_carriage_return;
 };
 
 }; // namespace Project81

@@ -88,8 +88,6 @@ void app(void)
 
         app = poll_input();
 
-        Project81::service_stdio_uart();
-
         /* UART heartbeat. */
         if (iterations % 2000 == 0)
         {

@@ -14,7 +14,14 @@ boards:
 # Generate coverage reports for native builds.
 toolchains:
   native:
-    extra_cflags: [-fprofile-arcs -ftest-coverage]
+    extra_cflags:
+      # Instrument builds for coverage and other analysis.
+      - -fprofile-arcs
+      - -ftest-coverage
+      # Attempt to catch more errors/warnings in common code.
+      - -Werror
+      - -Wextra
+      - -Wpedantic
 
 #
 # https://github.com/adafruit/uf2-samdx1/blob/master/inc/uf2format.h#L14-L17

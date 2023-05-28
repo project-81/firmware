@@ -5,14 +5,16 @@
 #include "chips/rp2040/UartManager.h"
 #include "common/buffer/PcBuffer.h"
 
-using UartManager = Project81::UartManager<32, 32>;
+static constexpr std::size_t uart_depth = 32;
+
+using UartManager = Project81::UartManager<uart_depth, uart_depth>;
 
 static UartManager manager = UartManager(uart0);
 
 static int putc_wrapper(char c, FILE *file)
 {
     (void)file;
-    manager.putc_block_if_full(c);
+    manager.putc_block(c);
     return 0;
 }
 
@@ -29,11 +31,6 @@ static FILE __stdio =
 FILE *const stdout = &__stdio;
 FILE *const stdin = nullptr;
 FILE *const stderr = nullptr;
-
-void Project81::service_stdio_uart(void)
-{
-    manager.dispatch();
-}
 
 bool Project81::getc_nonblocking(uint8_t &data)
 {

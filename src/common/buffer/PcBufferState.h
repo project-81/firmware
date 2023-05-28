@@ -27,39 +27,49 @@ class PcBufferState
         stats.reset();
     }
 
-    bool increment_data(bool drop)
+    inline bool has_enough_space(std::size_t count)
     {
-        bool result = space > 0;
+        return space >= count;
+    }
+
+    bool increment_data(bool drop, std::size_t count = 1)
+    {
+        bool result = has_enough_space(count);
 
         if (result)
         {
-            data++;
+            data += count;
             if (data > stats.high_watermark)
             {
                 stats.high_watermark = data;
             }
-            space--;
+            space -= count;
 
-            stats.write_count++;
+            stats.write_count += count;
         }
         else if (drop)
         {
-            stats.write_dropped++;
+            stats.write_dropped += count;
         }
 
         return result;
     }
 
-    bool decrement_data()
+    inline bool has_enough_data(std::size_t count)
     {
-        bool result = data > 0;
+        return data >= count;
+    }
+
+    bool decrement_data(std::size_t count = 1)
+    {
+        bool result = has_enough_data(count);
 
         if (result)
         {
-            data--;
-            space++;
+            data -= count;
+            space += count;
 
-            stats.read_count++;
+            stats.read_count += count;
         }
 
         return result;

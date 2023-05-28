@@ -2,6 +2,7 @@
 boards:
   - name: pi_pico
     chip: rp2040
+    targets: &pico_targets [uf2s]
     ldflags: &pico_ldflags
       - -Tsrc/third-party/pico-sdk/src/rp2_common/pico_standard_link/memmap_default.ld
     extra_dirs: &pico_dirs
@@ -57,12 +58,14 @@ boards:
 
   - name: pi_pico_w
     chip: rp2040
+    targets: *pico_targets
     ldflags: *pico_ldflags
     extra_dirs: *pico_dirs
     extra_cflags: *pico_cflags
 
   - name: xiao
     chip: rp2040
+    targets: *pico_targets
     ldflags: *pico_ldflags
     extra_dirs: *pico_dirs
     extra_cflags: *pico_cflags
