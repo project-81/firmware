@@ -97,6 +97,11 @@ class PcBufferState
         return data;
     }
 
+    inline std::size_t space_available(void)
+    {
+        return data;
+    }
+
     const std::size_t size;
 
   protected:

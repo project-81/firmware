@@ -1,19 +1,21 @@
 #pragma once
 
 /* toolchain */
-#include <array>
 #include <cassert>
 #include <cstring>
 #include <functional>
 
 /* internal */
 #include "common/buffer/CircularBuffer.h"
+#include "common/buffer/PcBufferInterface.h"
 #include "common/buffer/PcBufferState.h"
 
 namespace Project81
 {
 
-template <std::size_t depth, typename element_t = uint8_t> class PcBuffer
+template <std::size_t depth, typename element_t = uint8_t>
+class PcBuffer : public PcBufferWriter<element_t>,
+                 public PcBufferReader<element_t>
 {
     using ServiceCallback = std::function<void(PcBuffer<depth, element_t> *)>;
 
@@ -97,6 +99,18 @@ template <std::size_t depth, typename element_t = uint8_t> class PcBuffer
         return result;
     }
 
+    std::size_t try_pop_n(element_t *elem_array, std::size_t count)
+    {
+        count = std::min(count, state.data_available());
+
+        if (count)
+        {
+            assert(pop_n(elem_array, count));
+        }
+
+        return count;
+    }
+
     std::size_t pop_all(element_t *elem_array)
     {
         std::size_t result = state.data_available();
@@ -162,6 +176,18 @@ template <std::size_t depth, typename element_t = uint8_t> class PcBuffer
         return result;
     }
 
+    std::size_t try_push_n(const element_t *elem_array, std::size_t count)
+    {
+        count = std::min(count, state.space_available());
+
+        if (count)
+        {
+            assert(push_n(elem_array, count));
+        }
+
+        return count;
+    }
+
     void push_n_blocking(const element_t *elem_array, std::size_t count)
     {
         std::size_t chunk;
@@ -180,9 +206,8 @@ template <std::size_t depth, typename element_t = uint8_t> class PcBuffer
         }
     }
 
-    PcBufferState state;
-
   protected:
+    PcBufferState state;
     CircularBuffer<depth, element_t> buffer;
 
     ServiceCallback space_available;
