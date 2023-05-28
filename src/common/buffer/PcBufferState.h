@@ -3,9 +3,6 @@
 /* toolchain */
 #include <cstdint>
 
-/* internal */
-#include "common/buffer/PcBufferStats.h"
-
 namespace Project81
 {
 
@@ -13,18 +10,20 @@ class PcBufferState
 {
   public:
     PcBufferState(std::size_t _size)
-        : data(0), space(_size), size(_size), stats()
+        : size(_size), data(0), space(_size), high_watermark(0),
+          write_dropped(0)
     {
     }
 
-    void reset()
+    void reset(void)
     {
         /* Reset state. */
         data = 0;
         space = size;
 
         /* Reset stats. */
-        stats.reset();
+        high_watermark = 0;
+        write_dropped = 0;
     }
 
     inline bool has_enough_space(std::size_t count)
@@ -39,17 +38,15 @@ class PcBufferState
         if (result)
         {
             data += count;
-            if (data > stats.high_watermark)
+            if (data > high_watermark)
             {
-                stats.high_watermark = data;
+                high_watermark = data;
             }
             space -= count;
-
-            stats.write_count += count;
         }
         else if (drop)
         {
-            stats.write_dropped += count;
+            write_dropped += count;
         }
 
         return result;
@@ -68,26 +65,46 @@ class PcBufferState
         {
             data -= count;
             space += count;
-
-            stats.read_count += count;
         }
 
         return result;
     }
 
-    void poll_stats(PcBufferStats &update)
+    void poll_metrics(uint16_t &_high_watermark, uint16_t &_write_dropped,
+                      bool reset = true)
     {
-        update = stats;
-        stats.reset();
+        _high_watermark = high_watermark;
+        _write_dropped = write_dropped;
+        if (reset)
+        {
+            high_watermark = 0;
+            write_dropped = 0;
+        }
     }
 
-    std::size_t data;
-    std::size_t space;
+    inline bool empty(void)
+    {
+        return data == 0;
+    }
+
+    inline bool full(void)
+    {
+        return space == 0;
+    }
+
+    inline std::size_t data_available(void)
+    {
+        return data;
+    }
 
     const std::size_t size;
 
   protected:
-    PcBufferStats stats;
+    std::size_t data;
+    std::size_t space;
+
+    uint16_t high_watermark;
+    uint16_t write_dropped;
 };
 
 } // namespace Project81

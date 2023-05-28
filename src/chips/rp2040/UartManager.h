@@ -52,8 +52,6 @@ class UartManager : public FullDuplexBuffer<tx_depth, rx_depth>
 
     bool getc_nonblocking(uint8_t &data)
     {
-        /* Use this as an opportunity to service the receive buffer. */
-        service_rx(&this->rx_buffer);
         return this->rx_buffer.pop(data);
     }
 

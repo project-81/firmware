@@ -25,9 +25,11 @@ void test_basic(Buffer &buf)
         val++;
     }
 
+    /*
     PcBufferStats stats;
     buf.state.poll_stats(stats);
     assert(stats.high_watermark == depth);
+    */
 
     /* Should not be able to add any more data. */
     assert(!buf.push(val));

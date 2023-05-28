@@ -14,7 +14,11 @@ template <std::size_t depth, typename element_t = uint8_t> class CircularBuffer
     static_assert(depth > 0);
 
   public:
-    CircularBuffer() : buffer(), write_cursor(0), read_cursor(0)
+    using metrics_t = uint32_t;
+
+    CircularBuffer()
+        : buffer(), write_cursor(0), read_cursor(0), read_count(0),
+          write_count(0)
     {
     }
 
@@ -27,6 +31,8 @@ template <std::size_t depth, typename element_t = uint8_t> class CircularBuffer
     {
         buffer[write_index()] = elem;
         write_cursor++;
+
+        write_count++;
     }
 
     inline void write_n(const element_t *elem_array, std::size_t count)
@@ -52,6 +58,8 @@ template <std::size_t depth, typename element_t = uint8_t> class CircularBuffer
             count -= to_write;
             write_cursor += to_write;
             elem_array += to_write;
+
+            write_count += to_write;
         }
     }
 
@@ -64,6 +72,8 @@ template <std::size_t depth, typename element_t = uint8_t> class CircularBuffer
     {
         elem = buffer[read_index()];
         read_cursor++;
+
+        read_count++;
     }
 
     inline void read_n(element_t *elem_array, std::size_t count)
@@ -89,6 +99,20 @@ template <std::size_t depth, typename element_t = uint8_t> class CircularBuffer
             count -= to_read;
             read_cursor += to_read;
             elem_array += to_read;
+
+            read_count += to_read;
+        }
+    }
+
+    void poll_metrics(metrics_t &_read_count, metrics_t &_write_count,
+                      bool reset = true)
+    {
+        _read_count = read_count;
+        _write_count = write_count;
+        if (reset)
+        {
+            read_count = 0;
+            write_count = 0;
         }
     }
 
@@ -96,6 +120,9 @@ template <std::size_t depth, typename element_t = uint8_t> class CircularBuffer
     std::array<element_t, depth> buffer;
     std::size_t write_cursor;
     std::size_t read_cursor;
+
+    metrics_t read_count;
+    metrics_t write_count;
 };
 
 } // namespace Project81

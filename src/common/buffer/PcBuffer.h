@@ -18,10 +18,11 @@ template <std::size_t depth, typename element_t = uint8_t> class PcBuffer
     using ServiceCallback = std::function<void(PcBuffer<depth, element_t> *)>;
 
   public:
-    PcBuffer(ServiceCallback _space_available = nullptr,
+    PcBuffer(bool _auto_service = true,
+             ServiceCallback _space_available = nullptr,
              ServiceCallback _data_available = nullptr)
         : state(depth), buffer(), space_available(_space_available),
-          data_available(_data_available)
+          data_available(_data_available), auto_service(_auto_service)
     {
     }
 
@@ -39,24 +40,33 @@ template <std::size_t depth, typename element_t = uint8_t> class PcBuffer
         data_available = _data_available;
     }
 
-    inline bool empty()
+    inline bool empty(void)
     {
-        return state.data == 0;
+        return state.empty();
     }
 
-    inline bool full()
+    inline bool full(void)
     {
-        return state.space == 0;
+        return state.full();
     }
 
     inline void clear()
     {
         /* Reset state. */
         state.reset();
+
+        uint32_t tmp;
+        buffer.poll_metrics(tmp, tmp);
     }
 
     bool pop(element_t &elem)
     {
+        /* Allow a pop request to feed the buffer. */
+        if (auto_service)
+        {
+            service_space();
+        }
+
         bool result = state.decrement_data();
 
         if (result)
@@ -70,6 +80,12 @@ template <std::size_t depth, typename element_t = uint8_t> class PcBuffer
 
     bool pop_n(element_t *elem_array, std::size_t count)
     {
+        /* Allow a pop request to feed the buffer. */
+        if (auto_service)
+        {
+            service_space();
+        }
+
         bool result = state.decrement_data(count);
 
         if (result)
@@ -83,7 +99,7 @@ template <std::size_t depth, typename element_t = uint8_t> class PcBuffer
 
     std::size_t pop_all(element_t *elem_array)
     {
-        std::size_t result = state.data;
+        std::size_t result = state.data_available();
         if (result)
         {
             assert(pop_n(elem_array, result));
@@ -93,6 +109,11 @@ template <std::size_t depth, typename element_t = uint8_t> class PcBuffer
 
     bool push(const element_t elem, bool drop = false)
     {
+        if (auto_service)
+        {
+            service_data();
+        }
+
         bool result = state.increment_data(drop);
 
         if (result)
@@ -125,6 +146,11 @@ template <std::size_t depth, typename element_t = uint8_t> class PcBuffer
     bool push_n(const element_t *elem_array, std::size_t count,
                 bool drop = false)
     {
+        if (auto_service)
+        {
+            service_data();
+        }
+
         bool result = state.increment_data(drop, count);
 
         if (result)
@@ -161,6 +187,8 @@ template <std::size_t depth, typename element_t = uint8_t> class PcBuffer
 
     ServiceCallback space_available;
     ServiceCallback data_available;
+
+    bool auto_service;
 
     inline void service_data(bool required = false)
     {
