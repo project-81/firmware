@@ -3,6 +3,7 @@
 
 /* internal */
 #include "chips/rp2040/UartManager.h"
+#include "chips/rp2040/common.h"
 #include "common/buffer/PcBuffer.h"
 
 static constexpr std::size_t uart_depth = 32;

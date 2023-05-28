@@ -2,7 +2,6 @@
 #include <stdio.h>
 
 /* internal */
-#include "chips/rp2040/UartManager.h"
 #include "chips/rp2040/common.h"
 #include "generated/chips/rp2040/ws2812.h"
 
@@ -24,7 +23,7 @@ bool poll_input(void)
 {
     bool result = true;
 
-    std::uint8_t data;
+    uint8_t data;
     if (Project81::getc_nonblocking(data))
     {
         switch (data)
@@ -60,7 +59,7 @@ uint32_t urgb_u32(uint8_t r, uint8_t g, uint8_t b)
     return ((uint32_t)(r) << 8) | ((uint32_t)(g) << 16) | (uint32_t)(b);
 }
 
-static uint led_pin = 25;
+static constexpr uint led_pin = 25;
 
 void core1_app(void)
 {

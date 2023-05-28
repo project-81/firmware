@@ -11,7 +11,6 @@
 
 extern "C" void __attribute__((noreturn)) _exit(int status)
 {
-    (void)status;
     printf("Exiting %d.\n", status);
     Project81::reset(true);
 }
@@ -40,7 +39,7 @@ void reset(bool bootloader)
     __builtin_unreachable();
 }
 
-void dump_clocks()
+void dump_clocks(void)
 {
     printf("pll_sys  = %lu kHz\n",
            frequency_count_khz(CLOCKS_FC0_SRC_VALUE_PLL_SYS_CLKSRC_PRIMARY));
