@@ -30,11 +30,33 @@ uint8_t next_zero_distance(const uint8_t *data, std::size_t length,
         result++;
     }
 
+    /* Return 'distance', not index. */
     return result + 1;
+}
+
+bool MessageEncoder::stage(const uint8_t *_data, std::size_t _length)
+{
+    /*
+     * Can only stage a message if the previous encoding is complete, or
+     * the encoder hasn't been initialized yet.
+     */
+    bool result = state == not_initialized or state == complete;
+
+    if (result)
+    {
+        data = _data;
+        length = _length;
+        state = start;
+    }
+
+    return result;
 }
 
 bool MessageEncoder::encode(PcBufferWriter<> &writer)
 {
+    /* Attempting to encode with no staged message is a usage bug. */
+    assert(state != not_initialized);
+
     bool can_continue = true;
 
     while (state != complete and can_continue)
@@ -48,8 +70,7 @@ bool MessageEncoder::encode(PcBufferWriter<> &writer)
                 zero_pointer = next_zero_distance(data, length);
             }
 
-            can_continue = writer.push(zero_pointer);
-            if (can_continue)
+            if ((can_continue = writer.push(zero_pointer)))
             {
                 /* Ensure the last-pointer kind is set correctly. */
                 last_pointer_kind = (zero_pointer == zero_pointer_max)
@@ -72,91 +93,95 @@ bool MessageEncoder::encode(PcBufferWriter<> &writer)
             break;
 
         case encode_delimeter:
-            can_continue = writer.push(0);
-            if (can_continue)
+            if ((can_continue = writer.push(0)))
             {
                 state = complete;
             }
             break;
 
+        /*
+         * Not being initialized is a bug, and the complete state breaks us out
+         * of the loop.
+         */
         default:                     /* LCOV_EXCL_LINE */
             __builtin_unreachable(); /* LCOV_EXCL_LINE */
         }
     }
 
-    return state == complete;
+    bool result = state == complete;
+
+    if (result)
+    {
+        assert(zero_pointer == 0);
+        assert(length == 0);
+
+        state = not_initialized;
+    }
+
+    return result;
 }
 
-void MessageEncoder::advance_message(bool only_zero_pointer)
+void MessageEncoder::advance_message(bool only_zero_pointer, std::size_t count)
 {
     if (not only_zero_pointer)
     {
-        data++;
+        data += count;
 
-        assert(length > 0);
-        length--;
+        assert(length >= count);
+        length -= count;
     }
 
-    assert(zero_pointer > 0);
-    zero_pointer--;
+    assert(zero_pointer >= count);
+    zero_pointer -= count;
 }
 
 MessageEncoder::ZeroPointerState MessageEncoder::pointer_kind(void)
 {
-    if (zero_pointer >= length)
+    /*
+     * For a zero pointer to point to end-of-frame, it must be longer than the
+     * length.
+     */
+    if (zero_pointer > length)
     {
         return pointer_to_end;
     }
 
-    return (zero_pointer == zero_pointer_max or
-            last_pointer_kind == pointer_to_pointer)
-               ? pointer_to_pointer
-               : pointer_to_data;
+    return (zero_pointer == zero_pointer_max) ? pointer_to_pointer
+                                              : pointer_to_data;
 }
 
 bool MessageEncoder::handle_zero_pointer(PcBufferWriter<> &writer)
 {
     bool handled = false;
-    bool is_data = *data == 0;
+
+    bool is_overhead = last_pointer_kind == pointer_to_pointer;
 
     switch (zero_pointer_state)
     {
     case empty:
-        zero_pointer = next_zero_distance(data, length, true /* skip self */);
+        zero_pointer =
+            next_zero_distance(data, length, !is_overhead /* skip self */);
         zero_pointer_state = pointer_kind();
 
         /* See if we can write the newly populated zero pointer. */
         return handle_zero_pointer(writer);
 
     case pointer_to_data:
-        assert(is_data);
-        handled = writer.push(zero_pointer);
-        if (handled)
-        {
-            /* Only advance the pointer if this pointer is overhead. */
-            advance_message(last_pointer_kind == pointer_to_pointer);
-        }
-        break;
-
     case pointer_to_pointer:
-        handled = writer.push(zero_pointer);
-        if (handled)
-        {
-            /* Only advance the pointer if we're not on a data byte. */
-            advance_message(not is_data);
-        }
-        break;
-
     case pointer_to_end:
-        handled = writer.push(
-            (last_pointer_kind == pointer_to_pointer and not is_data)
-                ? zero_pointer + 1
-                : zero_pointer);
+        /*
+         * A 'pointer to the end' should never be followed by another zero
+         * pointer.
+         */
+        assert(last_pointer_kind != pointer_to_end);
 
-        if (handled and is_data)
+        if ((handled = writer.push(zero_pointer)))
         {
+            /* If this isn't an overhead pointer, we should be on a zero. */
+            assert(is_overhead or *data == 0);
+
             /* Only advance the pointer if this pointer is overhead. */
-            advance_message(last_pointer_kind == pointer_to_pointer);
+            advance_message(is_overhead);
         }
         break;
     }
@@ -197,23 +222,17 @@ bool MessageEncoder::handle_encode_data(PcBufferWriter<> &writer)
         state = encode_zero;
     }
 
-    /*
-     * Because the state machine starts by writing a zero, we
-     * should only reach this location when we don't expect to
-     * see a zero in the data (hence the assertion).
-     */
-    else
+    /* Write data until the next zero. */
+    else if ((can_continue = writer.push_n(data, zero_pointer)))
     {
-        assert(*data != 0);
+        advance_message(false, zero_pointer);
 
-        can_continue = writer.push(*data);
-        if (can_continue)
-        {
-            advance_message();
-
-            /* Keep processing data if there's more left. */
-            state = (length) ? encode_data : encode_delimeter;
-        }
+        /*
+         * Keep processing data if there's more left. Since we processed
+         * the entire data chunk (until the next zero), we know a zero
+         * comes next.
+         */
+        state = (length) ? encode_zero : encode_delimeter;
     }
 
     return can_continue;

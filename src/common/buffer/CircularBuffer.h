@@ -93,12 +93,15 @@ template <std::size_t depth, typename element_t = uint8_t> class CircularBuffer
             to_read = std::min(max_contiguous, count);
 
             /* Copy the bytes (buffer -> elements). */
-            std::memcpy(elem_array, &(buffer.data()[read_index()]),
-                        to_read * sizeof(element_t));
+            if (elem_array)
+            {
+                std::memcpy(elem_array, &(buffer.data()[read_index()]),
+                            to_read * sizeof(element_t));
+                elem_array += to_read;
+            }
 
             count -= to_read;
             read_cursor += to_read;
-            elem_array += to_read;
 
             read_count += to_read;
         }

@@ -1,5 +1,8 @@
 /* toolchain */
 #include <cstdio>
+#include <cstdlib>
+#include <cstring>
+#include <limits>
 
 /* internal */
 #include "common/buffer/PcBuffer.h"
@@ -7,9 +10,7 @@
 
 using namespace Project81;
 
-static constexpr std::size_t buffer_size = 1024;
-
-using PcBuf = PcBuffer<buffer_size>;
+static constexpr std::size_t buffer_size = 2048;
 
 void test_zero_distances(void)
 {
@@ -60,32 +61,84 @@ void dump(const uint8_t *data, std::size_t size)
     printf("\n");
 }
 
+void verify_encode_result(const uint8_t *output, std::size_t output_size,
+                          const uint8_t *expected, std::size_t expected_size,
+                          const char *name)
+{
+    if (name)
+    {
+        assert(expected_size and expected);
+
+        printf("Output   - (%zu)\n", output_size);
+        dump(output, output_size);
+
+        printf("\nExepcted - (%zu)\n", expected_size);
+        dump(expected, expected_size);
+    }
+
+    if (expected_size and expected)
+    {
+        assert(output_size == expected_size);
+
+        /* Confirm the contents. */
+        assert(std::memcmp(output, expected, expected_size) == 0);
+    }
+
+    if (name)
+    {
+        assert(expected_size and expected);
+        printf("\n(%s passed)\n", name);
+    }
+}
+
 void encoder_scenario(const uint8_t *input, std::size_t input_size,
-                      const uint8_t *expected, std::size_t expected_size,
-                      const char *name)
+                      const uint8_t *expected = nullptr,
+                      std::size_t expected_size = 0,
+                      const char *name = nullptr)
 {
     Cobs::MessageEncoder encoder = Cobs::MessageEncoder(input, input_size);
 
+    /* Shouldn't be able to stage a new message. */
+    assert(not encoder.stage(input, input_size));
+
     /* Encode the message. */
-    PcBuf buffer = PcBuf();
+    PcBuffer<buffer_size * 2> buffer = PcBuffer<buffer_size * 2>();
     assert(encoder.encode(buffer));
 
     /* Extract the result. */
-    uint8_t output[buffer_size];
+    uint8_t output[buffer_size * 2];
     std::size_t output_size = buffer.pop_all(output);
 
-    printf("Output   - (%zu)\n", output_size);
-    dump(output, output_size);
+    verify_encode_result(output, output_size, expected, expected_size, name);
 
-    printf("\nExepcted - (%zu)\n", expected_size);
-    dump(expected, expected_size);
+    /* Encode the message again, but with a minimally-sized buffer. */
+    PcBuffer<254> small_buffer = PcBuffer<254>();
 
-    assert(output_size == expected_size);
+    /* Should be able to stage a new message. */
+    assert(encoder.stage(input, input_size));
 
-    /* Confirm the contents. */
-    assert(std::memcmp(output, expected, expected_size) == 0);
+    uint8_t *output_ptr = output;
+    output_size = 0;
+    std::size_t curr_chunk;
 
-    printf("\n(%s passed)\n", name);
+    while (!encoder.encode(small_buffer))
+    {
+        curr_chunk = small_buffer.pop_all(output_ptr);
+
+        /* There should always be data to pop. */
+        assert(curr_chunk);
+
+        output_ptr += curr_chunk;
+        output_size += curr_chunk;
+    }
+
+    /* Process the last chunk. */
+    curr_chunk = small_buffer.pop_all(output_ptr);
+    output_ptr += curr_chunk;
+    output_size += curr_chunk;
+
+    /* Message should once again be correct. */
+    verify_encode_result(output, output_size, expected, expected_size, name);
 }
 
 int main(void)
@@ -93,9 +146,15 @@ int main(void)
     test_zero_distances();
 
     uint8_t input[buffer_size] = {0};
-    uint8_t output[buffer_size] = {0};
+    /* Make sure there's room for overhead. */
+    uint8_t output[buffer_size * 2] = {0};
     std::size_t input_size;
     std::size_t output_size;
+
+    /*
+     * See:
+     * https://en.wikipedia.org/wiki/Consistent_Overhead_Byte_Stuffing#Encoding_examples
+     */
 
     /*
      * Example 1.
@@ -306,6 +365,39 @@ int main(void)
 
     encoder_scenario(input, input_size, output, output_size,
                      "example 8 (longer)");
+
+    /*
+     * CHAOS TEST. Run the encoder at every possible buffer size with the
+     * following datasets:
+     * - all zeros
+     * - all ones
+     * - random data
+     *
+     * Make sure the program doesn't crash and that we don't violate
+     * any assertions.
+     */
+    int num_iterations = buffer_size - 1;
+    for (int i = 0; i < num_iterations; i++)
+    {
+        /* Run the scenario at every buffer size. */
+        input_size = i + 1;
+
+        /* Data with no zeroes. */
+        std::memset(input, 1, input_size);
+        encoder_scenario(input, input_size);
+
+        /* Data with all zeroes. */
+        std::memset(input, 0, input_size);
+        encoder_scenario(input, input_size);
+
+        /* Data with random contents zeroes. */
+        for (std::size_t j = 0; j < input_size; j++)
+        {
+            input[j] = rand() % std::numeric_limits<uint8_t>::max();
+        }
+        encoder_scenario(input, input_size);
+    }
+    printf("All %d random encoder tasks completed.\n", num_iterations);
 
     return 0;
 }
