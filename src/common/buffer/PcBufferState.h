@@ -99,7 +99,7 @@ class PcBufferState
 
     inline std::size_t space_available(void)
     {
-        return data;
+        return space;
     }
 
     const std::size_t size;
