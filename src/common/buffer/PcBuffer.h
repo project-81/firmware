@@ -17,9 +17,9 @@ template <std::size_t depth, typename element_t = uint8_t>
 class PcBuffer : public PcBufferWriter<element_t>,
                  public PcBufferReader<element_t>
 {
+  public:
     using ServiceCallback = std::function<void(PcBuffer<depth, element_t> *)>;
 
-  public:
     PcBuffer(bool _auto_service = true,
              ServiceCallback _space_available = nullptr,
              ServiceCallback _data_available = nullptr)
@@ -31,14 +31,14 @@ class PcBuffer : public PcBufferWriter<element_t>,
     void set_space_available(ServiceCallback _space_available)
     {
         /* Don't allow double assignment. */
-        assert(_space_available && space_available == nullptr);
+        assert(_space_available and space_available == nullptr);
         space_available = _space_available;
     }
 
     void set_data_available(ServiceCallback _data_available)
     {
         /* Don't allow double assignment. */
-        assert(_data_available && data_available == nullptr);
+        assert(_data_available and data_available == nullptr);
         data_available = _data_available;
     }
 
@@ -111,7 +111,7 @@ class PcBuffer : public PcBufferWriter<element_t>,
         return count;
     }
 
-    std::size_t pop_all(element_t *elem_array)
+    std::size_t pop_all(element_t *elem_array = nullptr)
     {
         std::size_t result = state.data_available();
         if (result)

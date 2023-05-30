@@ -33,7 +33,7 @@ template <typename element_t = uint8_t> class PcBufferReader
     virtual std::size_t try_pop_n(element_t *elem_array,
                                   std::size_t count) = 0;
 
-    virtual std::size_t pop_all(element_t *elem_array) = 0;
+    virtual std::size_t pop_all(element_t *elem_array = nullptr) = 0;
 };
 
 }; // namespace Project81
