@@ -6,6 +6,7 @@
 
 /* internal */
 #include "common/buffer/PcBuffer.h"
+#include "common/buffer/debug.h"
 #include "common/cobs/Encoder.h"
 
 using namespace Project81;
@@ -42,23 +43,6 @@ void test_zero_distances(void)
     assert(Cobs::next_zero_distance(data, 1024) == Cobs::zero_pointer_max);
     data[Cobs::zero_pointer_max - 1] = 1;
     assert(Cobs::next_zero_distance(data, 1024) == Cobs::zero_pointer_max);
-}
-
-void dump(const uint8_t *data, std::size_t size)
-{
-    for (std::size_t i = 0; i < size; i++)
-    {
-        printf("%02x ", data[i]);
-        if ((i + 1) % 16 == 0)
-        {
-            printf("\n");
-        }
-        else
-        {
-            printf(" ");
-        }
-    }
-    printf("\n");
 }
 
 void verify_encode_result(const uint8_t *output, std::size_t output_size,
