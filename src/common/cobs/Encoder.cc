@@ -52,6 +52,11 @@ bool MessageEncoder::stage(const uint8_t *_data, std::size_t _length)
     return result;
 }
 
+bool MessageEncoder::stage(const char *_data, std::size_t _length)
+{
+    return stage((const uint8_t *)_data, _length);
+}
+
 bool MessageEncoder::encode(PcBufferWriter<> &writer)
 {
     /* Attempting to encode with no staged message is a usage bug. */

@@ -1,10 +1,6 @@
-/* toolchain */
-#include <cstdio>
-
 /* internal */
 #include "common/buffer/PcBuffer.h"
-#include "common/buffer/debug.h"
-#include "common/cobs/Decoder.h"
+#include "common/cobs/debug.h"
 
 using namespace Project81;
 
@@ -20,22 +16,8 @@ void decoder_scenario(const uint8_t *message, std::size_t message_size,
 
     bool message_seen = false;
 
-    decoder.set_message_callback(
-        [&expected, &expected_size, &message_seen](
-            const std::array<uint8_t, message_mtu> &data, std::size_t size) {
-            printf("\nOutput   - (%zu)\n", size);
-            dump(data.data(), size);
-            printf("Exepcted - (%zu)\n", expected_size);
-            dump(expected, expected_size);
-
-            /* Only expect to see one message. */
-            assert(not message_seen);
-
-            assert(size == expected_size);
-            assert(std::memcmp(data.data(), expected, size) == 0);
-
-            message_seen = true;
-        });
+    register_message_validator<message_mtu>(decoder, message_seen, expected,
+                                            expected_size);
 
     /* Write the message into the buffer. */
     PcBuf buffer = PcBuf();
@@ -45,6 +27,18 @@ void decoder_scenario(const uint8_t *message, std::size_t message_size,
     decoder.dispatch(buffer);
 
     /* confirm that the message was actually seen. */
+    assert(message_seen);
+
+    message_seen = false;
+
+    /* Decode again, but one byte at a time. */
+    for (std::size_t i = 0; i < message_size; i++)
+    {
+        assert(not message_seen);
+        decoder.dispatch(buffer);
+        assert(buffer.push(message[i]));
+    }
+    decoder.dispatch(buffer);
     assert(message_seen);
 }
 
@@ -193,6 +187,42 @@ int main(void)
     /*
      * Example 10.
      */
+
+    message[0] = 0xff;
+    for (std::size_t i = 0; i < 255; i++)
+    {
+        message[i + 1] = i + 2;
+    }
+    message[255] = 1;
+    message[256] = 1;
+    message[257] = 0;
+
+    for (std::size_t i = 0; i < 255; i++)
+    {
+        expected[i] = i + 2;
+    }
+
+    decoder_scenario(message, 258, expected, 255);
+
+    /*
+     * Example 11.
+     */
+
+    message[0] = 0xfe;
+    for (std::size_t i = 0; i < 255; i++)
+    {
+        message[i + 1] = i + 3;
+    }
+    message[254] = 2;
+    message[255] = 1;
+    message[256] = 0;
+
+    for (std::size_t i = 0; i < 255; i++)
+    {
+        expected[i] = i + 3;
+    }
+
+    decoder_scenario(message, 257, expected, 255);
 
     return 0;
 }

@@ -20,18 +20,19 @@ uint8_t next_zero_distance(const uint8_t *data, std::size_t length,
 class MessageEncoder
 {
   public:
-    MessageEncoder(const uint8_t *_data = nullptr, std::size_t _length = 0)
+    MessageEncoder(const void *_data = nullptr, std::size_t _length = 0)
         : data(nullptr), length(0), state(not_initialized)
     {
         /* Advance to the start state if we were constructed with real data. */
         if (_data and _length)
         {
-            assert(stage(_data, _length));
+            assert(stage((const uint8_t *)_data, _length));
         }
     }
 
     /* Attempt to stage a message for encoding. */
     bool stage(const uint8_t *_data, std::size_t _length);
+    bool stage(const char *_data, std::size_t _length);
 
     /*
      * Make as much encoding progress as possible. Returns true when the staged
