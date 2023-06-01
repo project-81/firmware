@@ -38,8 +38,17 @@ def select_board_app(
     if board is None:
         return None
 
+    # Help build the rest of the path to the application, if just the name
+    # of the application is specified (and not any sub-directories).
+    try_app = kwargs.get("app", "")
+    if try_app:
+        for option in boards[board]:
+            if option.endswith(try_app):
+                try_app = option
+                break
+
     # Select an app.
-    app = manual_select("app", boards[board], default=kwargs.get("app", ""))
+    app = manual_select("app", boards[board], default=try_app)
     if app is None:
         return None
 

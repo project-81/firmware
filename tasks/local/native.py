@@ -18,7 +18,7 @@ from local.mixin import BoardAppMixin
 
 
 class RunNativeApp(BoardAppMixin):
-    """A task implementation for deploying firmware."""
+    """A task implementation for running native applications."""
 
     async def generate_coverage(
         self,
@@ -76,7 +76,7 @@ class RunNativeApp(BoardAppMixin):
 
         config: Config = args[0]
 
-        board = "native"
+        board = kwargs.get("board", "native")
 
         result = await self.select_board_app(
             config,

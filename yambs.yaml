@@ -9,7 +9,8 @@ boards:
   - name: grand_central
     chip: atsamd51x20
 
-# common_cflags: [-Isrc/third-party/json/single_include]
+# See: https://github.com/nlohmann/json/issues/1861#issuecomment-745998713.
+common_cflags: [-Isrc/third-party/json/single_include, -Wno-psabi]
 
 # Generate coverage reports for native builds.
 toolchains:

@@ -26,6 +26,7 @@ from local.ninja import register_ninja
 from local.node import register_node
 from local.openocd import register_openocd
 from local.python import register_python
+from local.viktor import register_viktor
 from local.yambs import register_yambs
 
 
@@ -66,16 +67,16 @@ def register(
         assert cwd_reg(manager, cwd), cwd_reg
 
     config = load()
-    for config_reg in [register_deploy, register_native]:
+    for config_reg in [register_deploy, register_native, register_viktor]:
         assert config_reg(manager, config), config_reg
 
-    # "github-clone.nlohmann.json"
     manager.register(
         Phony("third-party-clones"),
         [
             "github-shallow-clone.Cherrg.gdbgui-fix_447",
             "github-clone.raspberrypi.pico-sdk",
             "github-clone.raspberrypi.pico-examples",
+            "github-clone.nlohmann.json",
         ],
     )
 
