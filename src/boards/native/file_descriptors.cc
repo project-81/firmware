@@ -46,73 +46,31 @@ bool get_file_fd(const std::string path, FdMap &fds, const std::string mode)
     return result;
 }
 
+static const std::map<std::string, int> status_flags = {
+    /* Access modes. */
+    {"O_RDONLY", O_RDONLY},
+    {"O_WRONLY", O_WRONLY},
+    {"O_RDWR", O_RDWR},
+    /* Open-time flags. */
+    {"O_CREAT", O_CREAT},
+    {"O_EXCL", O_EXCL},
+    {"O_NOCTTY", O_NOCTTY},
+    {"O_TRUNC", O_TRUNC},
+    {"O_APPEND", O_APPEND},
+    {"O_ASYNC", O_ASYNC},
+    {"O_DIRECT", O_DIRECT},
+    {"O_NOATIME", O_NOATIME},
+    {"O_NONBLOCK", O_NONBLOCK},
+};
+
 static void dump_fd_status_flags(int flags, std::ostream &stream)
 {
+    stream << "status_flags ";
+
     /* Collect flags. */
     std::vector<std::string> flag_strs;
-
-    /*
-     * Access modes.
-     */
-    if (flags & O_RDONLY)
-    {
-        flag_strs.push_back("O_RDONLY=" + std::to_string(O_RDONLY));
-    }
-    if (flags & O_WRONLY)
-    {
-        flag_strs.push_back("O_WRONLY=" + std::to_string(O_WRONLY));
-    }
-    if (flags & O_RDWR)
-    {
-        flag_strs.push_back("O_RDWR=" + std::to_string(O_RDWR));
-    }
-
-    /*
-     * Open-time flags.
-     */
-    if (flags & O_CREAT)
-    {
-        flag_strs.push_back("O_CREAT=" + std::to_string(O_CREAT));
-    }
-    if (flags & O_EXCL)
-    {
-        flag_strs.push_back("O_EXCL=" + std::to_string(O_EXCL));
-    }
-    if (flags & O_NOCTTY)
-    {
-        flag_strs.push_back("O_NOCTTY=" + std::to_string(O_NOCTTY));
-    }
-    if (flags & O_TRUNC)
-    {
-        flag_strs.push_back("O_TRUNC=" + std::to_string(O_TRUNC));
-    }
-    if (flags & O_APPEND)
-    {
-        flag_strs.push_back("O_APPEND=" + std::to_string(O_APPEND));
-    }
-    if (flags & O_ASYNC)
-    {
-        flag_strs.push_back("O_ASYNC=" + std::to_string(O_ASYNC));
-    }
-    if (flags & O_DIRECT)
-    {
-        flag_strs.push_back("O_DIRECT=" + std::to_string(O_DIRECT));
-    }
-    if (flags & O_NOATIME)
-    {
-        flag_strs.push_back("O_NOATIME=" + std::to_string(O_NOATIME));
-    }
-    if (flags & O_NONBLOCK)
-    {
-        flag_strs.push_back("O_NONBLOCK=" + std::to_string(O_NONBLOCK));
-    }
-
-    stream << "status_flags=" << flags;
-
-    for (auto &flag_str : flag_strs)
-    {
-        stream << ", " << flag_str;
-    }
+    populate_flag_strs<int>(flags, flag_strs, status_flags, &stream,
+                            false /* endl */);
 }
 
 bool fd_info(int fd, std::ostream &stream)
