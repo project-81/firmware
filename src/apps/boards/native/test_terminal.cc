@@ -9,11 +9,40 @@
 
 /* internal */
 #include "boards/native/EpollManager.h"
+#include "boards/native/Termios.h"
 #include "boards/native/file_descriptors.h"
 
 using namespace Project81;
 
 using Epoll = EpollManager<>;
+
+bool echo_handler(int fd, uint32_t events)
+{
+    bool result = events & EPOLLIN;
+
+    /* Read from the file descriptor. */
+    if (result)
+    {
+        char data = '\0';
+        while (read(fd, &data, 1) == 1 && result)
+        {
+            result = data != 'q';
+
+            std::cout << int(data);
+            if (iscntrl(data))
+            {
+                std::cout << " <cntrl>";
+            }
+            else
+            {
+                std::cout << " (" << data << ")";
+            }
+            std::cout << std::endl;
+        }
+    }
+
+    return result;
+}
 
 int main(void)
 {
@@ -24,8 +53,10 @@ int main(void)
     assert(fd_set_blocking_state(fileno(stdout)));
     // assert(fd_set_blocking_state(fileno(stdin)));
 
+    int stdin_fd = fileno(stdin);
+
     /* Dump standard input/output */
-    fd_info(fileno(stdin));
+    fd_info(stdin_fd);
     fd_info(fileno(stdout));
     fd_info(fileno(stderr));
 
@@ -41,12 +72,26 @@ int main(void)
 
     bool result = false;
     {
+        Termios term(stdin_fd);
+
+        /* Turn input echo and canonical mode off. */
+        assert(term.set_echo(false));
+        assert(term.set_canonical(false));
+
         Epoll epoll;
 
         /* Add stdout/stdin. */
-        assert(epoll.ctl(Epoll::add, fileno(stdin), EPOLLIN));
+        assert(epoll.add(stdin_fd, EPOLLIN));
 
-        result = epoll.run();
+        /* Add an echo handler for stdin. */
+        assert(epoll.event_handler(stdin_fd, echo_handler));
+
+        int event_count = 0;
+        while (epoll.has_handlers())
+        {
+            event_count += epoll.run();
+        }
+        result = event_count > 0;
     }
     print_verb_name_condition("app", "run", result);
     return result ? 0 : 1;
