@@ -44,6 +44,31 @@ bool echo_handler(int fd, uint32_t events)
     return result;
 }
 
+void initialize(Termios &terminal, Epoll &epoll)
+{
+    /* Turn input echo and canonical mode off. */
+    assert(terminal.set_echo(false));
+    assert(terminal.set_canonical(false));
+
+    /* Add stdout/stdin. */
+    assert(epoll.add(terminal.fd, EPOLLIN));
+
+    /* Add an echo handler for stdin. */
+    assert(epoll.event_handler(terminal.fd, echo_handler));
+}
+
+bool app(Epoll &epoll)
+{
+    int event_count = 0;
+
+    while (epoll.has_handlers())
+    {
+        event_count += epoll.run();
+    }
+
+    return event_count > 0;
+}
+
 int main(void)
 {
     /* Disable stdout (and stdin) buffering and make it non-blocking. */
@@ -73,25 +98,10 @@ int main(void)
     bool result = false;
     {
         Termios term(stdin_fd);
-
-        /* Turn input echo and canonical mode off. */
-        assert(term.set_echo(false));
-        assert(term.set_canonical(false));
-
         Epoll epoll;
 
-        /* Add stdout/stdin. */
-        assert(epoll.add(stdin_fd, EPOLLIN));
-
-        /* Add an echo handler for stdin. */
-        assert(epoll.event_handler(stdin_fd, echo_handler));
-
-        int event_count = 0;
-        while (epoll.has_handlers())
-        {
-            event_count += epoll.run();
-        }
-        result = event_count > 0;
+        initialize(term, epoll);
+        result = app(epoll);
     }
     print_verb_name_condition("app", "run", result);
     return result ? 0 : 1;

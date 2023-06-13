@@ -24,8 +24,9 @@ class Termios
     bool set_echo(bool state, int optional_actions = default_action);
     bool set_canonical(bool state, int optional_actions = default_action);
 
+    const int fd;
+
   protected:
-    int fd;
     bool valid;
     struct termios original;
     struct termios current;
