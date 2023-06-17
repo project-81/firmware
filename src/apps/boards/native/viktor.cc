@@ -9,14 +9,16 @@
 #include "nlohmann/json.hpp"
 
 /* internal */
+#include "boards/native/FdManager.h"
 #include "boards/native/Viktor.h"
 #include "boards/native/file_descriptors.h"
 #include "boards/native/text.h"
 
 using namespace Project81;
 
-namespace fs = std::filesystem;
 using json = nlohmann::json;
+
+static constexpr std::string serial_key = "ttys";
 
 int main(int argc, const char **argv)
 {
@@ -33,50 +35,56 @@ int main(int argc, const char **argv)
     /* Dump configuration to output. */
     std::cout << data << std::endl;
 
-    FdMap fds;
-    bool initialization_errors = false;
-
-    /*
-     * Open serial ports.
-     */
-    for (auto &tty : data["ttys"].items())
-    {
-        initialization_errors |= !get_rw_file_fd(tty.value(), fds);
-    }
-
-    /*
-     * Create the event-poll interface.
-     */
-    int epoll = epoll_create1(EPOLL_CLOEXEC);
-    if (epoll < 0)
-    {
-        initialization_errors = true;
-    }
-    else
-    {
-        fds["epoll"] = epoll;
-    }
-    print_verb_name_condition("epoll", "create", !initialization_errors);
-
     int result = 1;
 
-    /*
-     * Start the application if initialization succeeds.
-     */
-    if (not initialization_errors)
     {
-        Viktor app(fds);
-        result = app.run();
+        bool initialization_errors = false;
+        FdManager fds;
+
+        /*
+         * Open serial ports.
+         */
+        for (auto &tty : data[serial_key].items())
+        {
+            initialization_errors |=
+                not fds.add_file_fd(tty.value(), serial_key);
+        }
+
+        /*
+         * Open TCP server port.
+         */
+
+        /*
+         * Open TCP client ports.
+         */
+        // future
+
+        /*
+         * Create the event-poll interface.
+         */
+        int epoll = epoll_create1(EPOLL_CLOEXEC);
+        if (epoll == -1)
+        {
+            initialization_errors = true;
+        }
+        else
+        {
+            fds.add_fd("epoll", epoll);
+        }
+        print_verb_name_condition("epoll", "create", epoll != -1);
+
+        /*
+         * Start the application if initialization succeeds.
+         */
+        print_verb_name_condition("viktor", "initialize",
+                                  not initialization_errors);
+        if (not initialization_errors)
+        {
+            Viktor app(fds);
+            result = app.run();
+        }
     }
 
-    if (result)
-    {
-        std::cerr << "Initialization failed." << std::endl;
-    }
-    else
-    {
-        std::cout << "Nominal exit." << std::endl;
-    }
-
+    print_verb_name_condition("viktor", "run", result == 0);
     return result;
 }

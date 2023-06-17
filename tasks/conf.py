@@ -10,7 +10,7 @@ from typing import Dict
 # third-party
 from vcorelib.task import Phony
 from vcorelib.task.manager import TaskManager
-from yambs.config import load
+from yambs.config import Config
 
 # internal
 from local.boards import register_boards
@@ -66,7 +66,7 @@ def register(
     for cwd_reg in [register_crosstool, register_yambs]:
         assert cwd_reg(manager, cwd), cwd_reg
 
-    config = load()
+    config = Config.load()
     for config_reg in [register_deploy, register_native, register_viktor]:
         assert config_reg(manager, config), config_reg
 
