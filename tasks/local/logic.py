@@ -13,7 +13,7 @@ from vcorelib.task.manager import TaskManager
 # internal
 from local.mixin import ShellCmdInDirMixin
 
-LOGIC_VERSION = "2.4.7"
+LOGIC_VERSION = "2.4.8"
 LOGIC_IMAGE = f"Logic-{LOGIC_VERSION}-master.AppImage"
 
 
